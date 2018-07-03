@@ -23,11 +23,14 @@ public class Options
   public Path playlistsPath;
   public Path thumbnailsPath;
   
+  public boolean autoFixPlaylistNamesInEntries;
+  
   Options()
   {
     retroarchPath = Paths.get("/retro/arch/path");
     playlistsPath = Paths.get("/play/lists/arch/path");
     thumbnailsPath = Paths.get("/thumbnails/arch/path");
+    autoFixPlaylistNamesInEntries = true;
   }
     
   void save(Path path) throws IOException
