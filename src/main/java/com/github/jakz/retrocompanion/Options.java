@@ -40,7 +40,7 @@ public class Options
   {
     return thumbnailsPath
       .resolve(type.folderName)
-      .resolve(game.name().replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
+      .resolve(game.name.replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
   }
     
   void save(Path path) throws IOException

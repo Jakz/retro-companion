@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.jakz.retrocompanion.Options;
 import com.pixbits.lib.functional.StreamException;
@@ -21,8 +23,8 @@ public class PlaylistParser
     PendingEntry entry = new PendingEntry();
     entry.path = Paths.get(lines.get(0));
     entry.name = lines.get(1);
-    entry.corePath = lines.get(2).equals("DETECT") ? Optional.empty() : Optional.of(Paths.get(lines.get(3)));
-    entry.coreName = lines.get(2).equals("DETECT") ? Optional.empty() : Optional.of(lines.get(4));
+    entry.corePath = lines.get(2).equals("DETECT") ? Optional.empty() : Optional.of(Paths.get(lines.get(2)));
+    entry.coreName = lines.get(3).equals("DETECT") ? Optional.empty() : Optional.of(lines.get(3));
     entry.databaseEntry = Optional.empty();
     entry.playlistName = Paths.get(lines.get(5));
     
@@ -52,13 +54,18 @@ public class PlaylistParser
     Playlist playlist = new Playlist(filepath);
     
     try
-    {
+    {    
       StreamUtil.assemble(Files.lines(filepath), 6)
         .map(StreamException.rethrowFunction(PlaylistParser::parseEntry))
         .map(StreamException.rethrowFunction(pe -> resolve(playlist, pe)))
         .forEach(playlist::add);
     }
     catch (IOException e)
+    {
+      e.printStackTrace();
+      return null;
+    }
+    catch (Exception e)
     {
       e.printStackTrace();
       return null;

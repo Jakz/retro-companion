@@ -9,7 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class Playlist implements Iterable<Entry>
+import com.pixbits.lib.ui.table.DataSource;
+
+public class Playlist implements Iterable<Entry>, DataSource<Entry>
 {
   private Path path;
   
@@ -43,4 +45,13 @@ public class Playlist implements Iterable<Entry>
   @Override
   public Iterator<Entry> iterator() { return entries.iterator(); }
   public Stream<Entry> stream() { return entries.stream(); }
+
+  @Override
+  public Entry get(int index) { return entries.get(index); }
+
+  @Override
+  public int size() { return entries.size(); }
+
+  @Override
+  public int indexOf(Entry entry) { return entries.indexOf(entry); }
 }

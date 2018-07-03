@@ -5,8 +5,8 @@ import java.util.Optional;
 
 public class Entry
 {
-  Path path;
-  private String name;
+  public Path path;
+  public String name;
   Optional<CoreReference> core;
   Optional<DatabaseReference> databaseEntry;
   Playlist playlist;
@@ -21,9 +21,7 @@ public class Entry
     this.core = Optional.empty();
     this.databaseEntry  = Optional.empty();
   }
-  
-  public String name() { return name; }
-  
+    
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
   
   public String toPlaylistFormat()

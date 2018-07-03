@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import com.github.jakz.retrocompanion.playlist.Playlist;
 import com.github.jakz.retrocompanion.playlist.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.PathsPanel;
+import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.WrapperFrame;
 
@@ -52,13 +53,23 @@ public class Main
   
   public static void main(String[] args)
   {
-
     try
     {
+      UIUtils.setNimbusLNF();
+      
       loadOptions();
 
       PlaylistParser parser = new PlaylistParser(options);
-      Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
+      Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
+      //Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
+      
+      PlaylistTablePanel panel = new PlaylistTablePanel();
+      WrapperFrame<?> frame = UIUtils.buildFrame(panel, "Playlist");
+      panel.setPlaylist(playlist);
+
+      frame.exitOnClose();
+      frame.centerOnScreen();
+      frame.setVisible(true);
       
       playlist.save(Paths.get("test.lpl"));
     } 
@@ -71,7 +82,6 @@ public class Main
       return;
     
     
-    UIUtils.setNimbusLNF();
     WrapperFrame<?> frame = UIUtils.buildFrame(new PathsPanel(options), "Paths");
 
     frame.exitOnClose();
