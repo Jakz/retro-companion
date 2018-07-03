@@ -8,6 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.github.jakz.retrocompanion.playlist.Entry;
+import com.github.jakz.retrocompanion.playlist.Playlist;
+import com.github.jakz.retrocompanion.playlist.ThumbnailType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
@@ -31,6 +34,13 @@ public class Options
     playlistsPath = Paths.get("/play/lists/arch/path");
     thumbnailsPath = Paths.get("/thumbnails/arch/path");
     autoFixPlaylistNamesInEntries = true;
+  }
+  
+  public Path pathForThumbnail(Playlist playlist, ThumbnailType type, Entry game)
+  {
+    return thumbnailsPath
+      .resolve(type.folderName)
+      .resolve(game.name().replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
   }
     
   void save(Path path) throws IOException

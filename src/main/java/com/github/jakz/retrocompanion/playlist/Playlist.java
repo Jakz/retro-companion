@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.stream.Stream;
 
-public class Playlist
+public class Playlist implements Iterable<Entry>
 {
   private Path path;
   
@@ -37,4 +39,8 @@ public class Playlist
         wrt.write(entry.toPlaylistFormat());
     }
   }
+
+  @Override
+  public Iterator<Entry> iterator() { return entries.iterator(); }
+  public Stream<Entry> stream() { return entries.stream(); }
 }
