@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 
+import com.github.jakz.retrocompanion.playlist.Core;
 import com.github.jakz.retrocompanion.playlist.CoreParser;
 import com.github.jakz.retrocompanion.playlist.Playlist;
 import com.github.jakz.retrocompanion.playlist.PlaylistParser;
 import com.github.jakz.retrocompanion.playlist.ThumbnailType;
+import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.PathsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
 import com.pixbits.lib.ui.UIUtils;
@@ -59,7 +62,15 @@ public class Main
     {
       UIUtils.setNimbusLNF();
       
-      new CoreParser().parse(options);
+      List<Core> cores = new CoreParser().parse(options);
+      CoreTablePanel coresPanel = new CoreTablePanel(options);
+      coresPanel.setCores(cores);
+      
+      WrapperFrame<?> coresFrame = UIUtils.buildFrame(coresPanel, "Cores");
+
+      coresFrame.exitOnClose();
+      coresFrame.centerOnScreen();
+      coresFrame.setVisible(true);
       
       if (true)
         return;

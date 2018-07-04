@@ -38,7 +38,7 @@ public class CoreParser
           //  throw new ParseException("info file value should be quoted by \" (%s)", line);
           
           if (fieldValue.charAt(0) == '\"')
-            fieldValue = fieldValue.substring(1, fieldValue.length());
+            fieldValue = fieldValue.substring(1, fieldValue.length()-1);
           
           fields.put(fieldName, fieldValue);
         });
