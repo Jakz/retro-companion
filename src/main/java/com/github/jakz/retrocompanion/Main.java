@@ -7,11 +7,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 
-import com.github.jakz.retrocompanion.playlist.Core;
-import com.github.jakz.retrocompanion.playlist.CoreParser;
-import com.github.jakz.retrocompanion.playlist.Playlist;
-import com.github.jakz.retrocompanion.playlist.PlaylistParser;
-import com.github.jakz.retrocompanion.playlist.ThumbnailType;
+import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.CoreParser;
+import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.data.PlaylistParser;
+import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.PathsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;

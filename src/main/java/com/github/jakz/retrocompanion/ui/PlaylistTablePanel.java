@@ -19,9 +19,9 @@ import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
 
 import com.github.jakz.retrocompanion.Options;
-import com.github.jakz.retrocompanion.playlist.Entry;
-import com.github.jakz.retrocompanion.playlist.Playlist;
-import com.github.jakz.retrocompanion.playlist.ThumbnailType;
+import com.github.jakz.retrocompanion.data.Entry;
+import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
 import com.pixbits.lib.ui.table.TableModel;

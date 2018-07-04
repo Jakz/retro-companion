@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion.playlist;
+package com.github.jakz.retrocompanion.data;
 
 import java.nio.file.Path;
 import java.util.Optional;

@@ -8,9 +8,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import com.github.jakz.retrocompanion.playlist.Entry;
-import com.github.jakz.retrocompanion.playlist.Playlist;
-import com.github.jakz.retrocompanion.playlist.ThumbnailType;
+import com.github.jakz.retrocompanion.data.Entry;
+import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.InstanceCreator;
