@@ -5,10 +5,10 @@ import java.util.Optional;
 
 public class PendingEntry
 {
-  Path path;
-  String name;
-  Optional<Path> corePath;
-  Optional<String> coreName;
-  Optional<DatabaseReference> databaseEntry;
-  Path playlistName;
+  public Path path;
+  public String name;
+  public Optional<Path> corePath;
+  public Optional<String> coreName;
+  public Optional<DatabaseReference> databaseEntry;
+  public Path playlistName;
 }

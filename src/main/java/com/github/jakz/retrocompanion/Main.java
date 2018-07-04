@@ -8,10 +8,11 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import com.github.jakz.retrocompanion.data.Core;
-import com.github.jakz.retrocompanion.data.CoreParser;
+import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Playlist;
-import com.github.jakz.retrocompanion.data.PlaylistParser;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.github.jakz.retrocompanion.parsers.CoreParser;
+import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.PathsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
@@ -62,7 +63,8 @@ public class Main
     {
       UIUtils.setNimbusLNF();
       
-      List<Core> cores = new CoreParser().parse(options);
+      CoreSet cores = new CoreParser().parse(options);
+      options.cores = cores;
       CoreTablePanel coresPanel = new CoreTablePanel(options);
       coresPanel.setCores(cores);
       
@@ -72,24 +74,22 @@ public class Main
       coresFrame.centerOnScreen();
       coresFrame.setVisible(true);
       
-      if (true)
-        return;
-      
-      //loadOptions();
-
       PlaylistParser parser = new PlaylistParser(options);
       Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
       //Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
       
-      PlaylistTablePanel panel = new PlaylistTablePanel(options);
-      WrapperFrame<?> frame = UIUtils.buildFrame(panel, "Playlist");
-            
-      panel.setPlaylist(playlist);
-
-      frame.exitOnClose();
-      frame.centerOnScreen();
-      frame.setVisible(true);
+      PlaylistTablePanel playlistPanel = new PlaylistTablePanel(options);
+      WrapperFrame<?> playlistFrame = UIUtils.buildFrame(playlistPanel, "Playlist");
       
+      playlistPanel.setPlaylist(playlist);
+
+      playlistFrame.exitOnClose();
+      playlistFrame.centerOnScreen();
+      playlistFrame.setVisible(true);
+      
+      if (true)
+        return;
+
       playlist.save(Paths.get("test.lpl"));
     } 
     catch (IOException e)

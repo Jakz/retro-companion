@@ -11,23 +11,25 @@ public class Entry
 {
   public Path path;
   private String name;
-  Optional<CoreReference> core;
+  private Optional<Core.Ref> core;
   Optional<DatabaseReference> databaseEntry;
   Playlist playlist;
   
-  public Entry(Playlist playlist, Path path, String name)
+  public Entry(Playlist playlist, Path path, String name, Optional<Core.Ref> core)
   {
     this.playlist = playlist;
     
     this.path = path;
     this.name = name;
     
-    this.core = Optional.empty();
+    this.core = core;
     this.databaseEntry  = Optional.empty();
   }
     
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
   
+  public void setCore(Optional<Core.Ref> core) { this.core = core; }
+  public Optional<Core.Ref> core() { return core; } 
   public String name() { return name; }
   
   public boolean rename(String name, Options options)
@@ -65,13 +67,13 @@ public class Entry
       .append(name).append(nl)
       
       .append(core
-          .map(CoreReference::path)
+          .map(Core.Ref::path)
           .map(Object::toString)
           .orElse("DETECT")
       ).append(nl)
       
       .append(core
-          .map(CoreReference::name)
+          .map(Core.Ref::name)
           .orElse("DETECT")
       ).append(nl)
       

@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion.data;
+package com.github.jakz.retrocompanion.parsers;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,19 +10,21 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.jakz.retrocompanion.Options;
+import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.CoreSet;
 import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.FolderScanner;
 
 public class CoreParser
 {
-  public List<Core> parse(Options options) throws IOException
+  public CoreSet parse(Options options) throws IOException
   {
     FolderScanner scanner = new FolderScanner(false);
     
     Set<Path> paths = scanner.scan(options.coresPath);
     
-    return paths.stream()
+    return new CoreSet(paths.stream()
       .map(StreamException.rethrowFunction(lib -> {
         Path infoFilePath = options.infoPath.resolve(FileUtils.fileNameWithoutExtension(lib) + ".info");
   
@@ -49,6 +51,6 @@ public class CoreParser
         
         return new Core(lib, displayName, coreName, systemName);
       }))
-      .collect(Collectors.toList());
+      .collect(Collectors.toList()));
   }
 }

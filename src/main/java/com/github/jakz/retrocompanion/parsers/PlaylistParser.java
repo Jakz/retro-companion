@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion.data;
+package com.github.jakz.retrocompanion.parsers;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -10,6 +10,12 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import com.github.jakz.retrocompanion.Options;
+import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.CoreSet;
+import com.github.jakz.retrocompanion.data.Entry;
+import com.github.jakz.retrocompanion.data.ParseException;
+import com.github.jakz.retrocompanion.data.PendingEntry;
+import com.github.jakz.retrocompanion.data.Playlist;
 import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.functional.StreamUtil;
 
@@ -40,13 +46,25 @@ public class PlaylistParser
   
   public Entry resolve(Playlist playlist, PendingEntry entry)
   {
+    CoreSet cores = options.cores;
+    
     /* parse core */
+    Optional<Core.Ref> coreRef = entry.corePath.map(StreamException.rethrowFunction(corePath -> {
+      Core core = cores.forPath(corePath);
+      
+      if (core == null)
+        throw new ParseException("Unknown core for entry: %s", corePath);
+      
+      return new Core.Ref(core, entry.coreName);
+    }));
+    
+
     /* parse database reference */
     
     if (!options.autoFixPlaylistNamesInEntries && !entry.playlistName.toString().equals(playlist.nameWithExtension()))
       throw new ParseException("Name of playlist in entry doesn't match name of playlist itself ('%s' != '%s')", entry.playlistName.toString(), playlist.nameWithExtension());
 
-    return new Entry(playlist, entry.path, entry.name);
+    return new Entry(playlist, entry.path, entry.name, coreRef);
   }
   
   public Playlist parse(Path filepath)

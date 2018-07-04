@@ -8,6 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
@@ -29,6 +30,9 @@ public class Options
   public Path infoPath;
   
   public boolean autoFixPlaylistNamesInEntries;
+  
+  /* TODO: we're passing it here but maybe there's a better place */
+  public transient CoreSet cores;
   
   Options()
   {

@@ -6,9 +6,15 @@ import java.awt.Component;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
+import javax.swing.DefaultCellEditor;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -17,8 +23,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
 
 import com.github.jakz.retrocompanion.Options;
+import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
@@ -26,6 +35,7 @@ import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
 import com.pixbits.lib.ui.table.TableModel;
 import com.pixbits.lib.ui.table.editors.PathArgumentEditor;
+import com.pixbits.lib.ui.table.renderers.DefaultTableAndListRenderer;
 
 public class PlaylistTablePanel extends JPanel
 {
@@ -35,6 +45,7 @@ public class PlaylistTablePanel extends JPanel
   private Model model;
   private Playlist playlist;
   
+  @SuppressWarnings("unchecked")
   public PlaylistTablePanel(Options options)
   {
     this.options = options;
@@ -97,6 +108,34 @@ public class PlaylistTablePanel extends JPanel
         }
       });
       
+      //e.core().map(Core.Ref::shortLibraryName).orElse("DETECT")
+      Function<Entry, Optional<Core.Ref>> getter = e -> e.core();
+      BiConsumer<Entry, Optional<Core.Ref>> setter = (e,v) -> e.setCore(v.map(Core.Ref::dupe));
+      ColumnSpec<Entry, Optional<Core.Ref>> coreColumn = new ColumnSpec<Entry, Optional<Core.Ref>>("Core", (Class<Optional<Core.Ref>>)(Class<?>)Optional.class, getter, setter);
+      model.addColumn(coreColumn);
+      
+      Stream<Optional<Core.Ref>> cores = Stream.concat(
+          Stream.of(Optional.empty()), 
+          options.cores.stream().map(c -> Optional.of(new Core.Ref(c, Optional.empty())))
+      );
+
+
+      DefaultTableAndListRenderer<Optional<Core.Ref>> renderer = new DefaultTableAndListRenderer<>()
+      {
+        @Override
+        public void decorate(JLabel label, JComponent source, Optional<Core.Ref> value, int index, boolean isSelected, boolean hasFocus)
+        {
+          label.setText(value.map(c -> c.shortLibraryName()).orElse("DETECT"));
+        }
+      };
+      
+      JComboBox<Optional<Core.Ref>> comboBox = new JComboBox<>(cores.toArray(i -> new Optional<?>[i]));
+      comboBox.setRenderer(renderer);
+      
+      coreColumn.setEditable(true);
+      coreColumn.setRenderer(renderer);
+      coreColumn.setEditor(new DefaultCellEditor(comboBox));
+            
       model.fireTableStructureChanged();
     }
     catch (Exception e)

@@ -9,6 +9,7 @@ import javax.swing.JTable;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
@@ -38,7 +39,7 @@ public class CoreTablePanel extends JPanel
       model.addColumn(new ColumnSpec<>("Name", Core.class.getField("coreName"), false));
       model.addColumn(new ColumnSpec<>("Display Name", Core.class.getField("displayName"), false));
       model.addColumn(new ColumnSpec<>("System", Core.class.getField("systemName"), false));
-      model.addColumn(new ColumnSpec<>("Path", Core.class.getField("path"), false));
+      model.addColumn(new ColumnSpec<>("Path", String.class, c -> c.shortLibraryName()));
     } 
     catch (NoSuchFieldException | SecurityException e) 
     {
@@ -46,9 +47,9 @@ public class CoreTablePanel extends JPanel
     }
   }
   
-  public void setCores(List<Core> cores)
+  public void setCores(CoreSet cores)
   {
-    this.cores = DataSource.of(cores);
+    this.cores = cores;
     model.setData(this.cores);
     model.fireTableStructureChanged();
   }
