@@ -38,7 +38,7 @@ public class PathsPanel extends JPanel
   
   private final Options options;
   
-  private final String[] captions = { "RetroArch Path", "Playlists Path", "Thumbnails Path" };
+  private final String[] captions = { "RetroArch Path", "Cores Path", "Info Path", "Playlists Path", "Thumbnails Path"};
   private final BrowseButton[] browseFields;
     
   public PathsPanel(Options options)
@@ -73,10 +73,21 @@ public class PathsPanel extends JPanel
     
   }
   
+  public void refresh()
+  {
+    browseFields[0].setText(options.retroarchPath.toString());
+    browseFields[1].setText(options.coresPath.toString());
+    browseFields[2].setText(options.infoPath.toString());
+    browseFields[3].setText(options.playlistsPath.toString());
+    browseFields[4].setText(options.thumbnailsPath.toString());
+  }
+  
   private void onPathChanged()
   {
     options.retroarchPath = browseFields[0].getPath();
-    options.playlistsPath = browseFields[1].getPath();
-    options.thumbnailsPath = browseFields[2].getPath();
+    options.coresPath = browseFields[1].getPath();
+    options.infoPath = browseFields[2].getPath();
+    options.playlistsPath = browseFields[3].getPath();
+    options.thumbnailsPath = browseFields[4].getPath();
   }
 }

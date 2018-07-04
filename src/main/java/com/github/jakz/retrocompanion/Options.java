@@ -25,6 +25,8 @@ public class Options
   public Path retroarchPath;
   public Path playlistsPath;
   public Path thumbnailsPath;
+  public Path coresPath;
+  public Path infoPath;
   
   public boolean autoFixPlaylistNamesInEntries;
   
@@ -39,7 +41,8 @@ public class Options
   {
     playlistsPath = retroarchPath.resolve("playlists");
     thumbnailsPath = retroarchPath.resolve("thumbnails");
-
+    coresPath = retroarchPath.resolve("cores");
+    infoPath = retroarchPath.resolve("info");
   }
   
   public Path pathForThumbnail(Playlist playlist, ThumbnailType type, Entry game)

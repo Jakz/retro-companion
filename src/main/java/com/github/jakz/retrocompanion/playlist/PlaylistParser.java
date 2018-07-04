@@ -18,7 +18,7 @@ public class PlaylistParser
   public static PendingEntry parseEntry(List<String> lines)
   {
     if (lines.size() != 6)
-      throw new PlaylistParseException("an entry requires 6 lines to be parsed correctly");
+      throw new ParseException("an entry requires 6 lines to be parsed correctly");
     
     PendingEntry entry = new PendingEntry();
     entry.path = Paths.get(lines.get(0));
@@ -44,7 +44,7 @@ public class PlaylistParser
     /* parse database reference */
     
     if (!options.autoFixPlaylistNamesInEntries && !entry.playlistName.toString().equals(playlist.nameWithExtension()))
-      throw new PlaylistParseException("Name of playlist in entry doesn't match name of playlist itself ('%s' != '%s')", entry.playlistName.toString(), playlist.nameWithExtension());
+      throw new ParseException("Name of playlist in entry doesn't match name of playlist itself ('%s' != '%s')", entry.playlistName.toString(), playlist.nameWithExtension());
 
     return new Entry(playlist, entry.path, entry.name);
   }

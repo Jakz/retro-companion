@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import com.github.jakz.retrocompanion.playlist.CoreParser;
 import com.github.jakz.retrocompanion.playlist.Playlist;
 import com.github.jakz.retrocompanion.playlist.PlaylistParser;
 import com.github.jakz.retrocompanion.playlist.ThumbnailType;
@@ -57,6 +58,11 @@ public class Main
     try
     {
       UIUtils.setNimbusLNF();
+      
+      new CoreParser().parse(options);
+      
+      if (true)
+        return;
       
       //loadOptions();
 
