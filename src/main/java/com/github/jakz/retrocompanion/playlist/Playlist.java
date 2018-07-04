@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.ui.table.DataSource;
 
 public class Playlist implements Iterable<Entry>, DataSource<Entry>
@@ -28,6 +29,11 @@ public class Playlist implements Iterable<Entry>, DataSource<Entry>
     entries.add(entry);
   }
   
+  public String name()
+  {
+    return FileUtils.fileNameWithoutExtension(path);
+  }
+  
   public String nameWithExtension() 
   { 
     return path.getFileName().toString(); 
@@ -40,6 +46,14 @@ public class Playlist implements Iterable<Entry>, DataSource<Entry>
       for (Entry entry : entries)
         wrt.write(entry.toPlaylistFormat());
     }
+  }
+  
+  public Entry get(String name)
+  {
+    return stream()
+      .filter(e -> e.name().equals(name))
+      .findFirst()
+      .orElse(null);
   }
 
   @Override

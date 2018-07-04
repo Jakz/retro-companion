@@ -67,9 +67,8 @@ public class PathsPanel extends JPanel
     }
     
     browseFields[0].setCallback(p -> {
-      browseFields[1].setPath(p.resolve("playlists"));
-      browseFields[2].setPath(p.resolve("thumbnails"));
       onPathChanged();
+      options.derivePathsFromRetroarch();
     });
     
   }

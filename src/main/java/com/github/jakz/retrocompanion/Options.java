@@ -30,17 +30,24 @@ public class Options
   
   Options()
   {
-    retroarchPath = Paths.get("/retro/arch/path");
-    playlistsPath = Paths.get("/play/lists/arch/path");
-    thumbnailsPath = Paths.get("/thumbnails/arch/path");
+    retroarchPath = Paths.get("F:\\Misc\\Frontends\\Retroarch");
+    derivePathsFromRetroarch();
     autoFixPlaylistNamesInEntries = true;
+  }
+  
+  public void derivePathsFromRetroarch()
+  {
+    playlistsPath = retroarchPath.resolve("playlists");
+    thumbnailsPath = retroarchPath.resolve("thumbnails");
+
   }
   
   public Path pathForThumbnail(Playlist playlist, ThumbnailType type, Entry game)
   {
     return thumbnailsPath
+      .resolve(playlist.name())
       .resolve(type.folderName)
-      .resolve(game.name.replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
+      .resolve(game.name().replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
   }
     
   void save(Path path) throws IOException

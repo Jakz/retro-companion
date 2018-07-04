@@ -1,12 +1,16 @@
 package com.github.jakz.retrocompanion.playlist;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+
+import com.github.jakz.retrocompanion.Options;
 
 public class Entry
 {
   public Path path;
-  public String name;
+  private String name;
   Optional<CoreReference> core;
   Optional<DatabaseReference> databaseEntry;
   Playlist playlist;
@@ -23,6 +27,33 @@ public class Entry
   }
     
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
+  
+  public String name() { return name; }
+  
+  public boolean rename(String name, Options options)
+  {
+    for (ThumbnailType tt : ThumbnailType.values())
+    {
+      Path oldPath = options.pathForThumbnail(playlist, tt, this);
+      Path newPath = oldPath.getParent().resolve(name+".png");
+      
+      if (Files.exists(oldPath))
+      {
+        try 
+        {
+          Files.move(oldPath, newPath);
+        } 
+        catch (IOException e)
+        {
+          e.printStackTrace();
+          return false;
+        }
+      }
+    }
+    
+    this.name = name;
+    return true;
+  }
   
   public String toPlaylistFormat()
   {
