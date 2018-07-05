@@ -78,7 +78,10 @@ public class PlaylistTablePanel extends JPanel
         if (entryWithSameName != null && entryWithSameName != e)
           JOptionPane.showMessageDialog(this, "The name is already used for another entry!", "Error", JOptionPane.ERROR_MESSAGE);
         else
+        {
           e.rename(v, options);
+          mediator.onEntrySelected(e);
+        }
       });
       nameColumn.setEditable(true);
       model.addColumn(nameColumn);

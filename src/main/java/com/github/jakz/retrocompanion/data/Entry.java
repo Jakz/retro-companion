@@ -32,7 +32,7 @@ public class Entry
   public void setCore(Optional<Core.Ref> core) { this.core = core; }
   public Optional<Core.Ref> core() { return core; } 
   public String name() { return name; }
-  
+
   public boolean rename(String name, Options options)
   {
     for (ThumbnailType tt : ThumbnailType.values())

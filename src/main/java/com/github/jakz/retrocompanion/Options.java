@@ -30,6 +30,8 @@ public class Options
   public Path infoPath;
   
   public boolean autoFixPlaylistNamesInEntries;
+  public boolean overwriteThumbnailWithoutConfirmation;
+  public boolean thumbnailMoveInsteadThanCopy;
   
   /* TODO: we're passing it here but maybe there's a better place */
   public transient CoreSet cores;
@@ -38,7 +40,10 @@ public class Options
   {
     retroarchPath = Paths.get("F:\\Misc\\Frontends\\Retroarch");
     derivePathsFromRetroarch();
+    
     autoFixPlaylistNamesInEntries = true;
+    overwriteThumbnailWithoutConfirmation = true;
+    thumbnailMoveInsteadThanCopy = false;
   }
   
   public void derivePathsFromRetroarch()
