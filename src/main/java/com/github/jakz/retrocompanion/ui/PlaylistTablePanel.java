@@ -195,12 +195,17 @@ public class PlaylistTablePanel extends JPanel
     this.playlist = playlist;
     table.clearSelection();
     model.setData(playlist);
-    model.fireTableDataChanged();
+    refresh();
   }
   
   public Playlist playlist()
   {
     return playlist;
+  }
+  
+  public void refresh()
+  {
+    model.fireTableDataChanged();
   }
   
   

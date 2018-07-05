@@ -20,18 +20,33 @@ public class Toolbar extends JToolBar
   public Toolbar(Mediator mediator)
   {
     this.mediator = mediator;
-        
+
+    JButton addEntry = new JButton(Icon.ADD_ENTRY.icon(24));
+    addEntry.setToolTipText(Strings.HELP_ADD_NEW_ENTRY.text());
+    addEntry.addActionListener(e -> Tasks.addEntryToPlaylist(mediator));
+    add(addEntry);   
+    
+    JButton deleteSelectionButton = new JButton(Icon.DELETE_ENTRY.icon(24));
+    deleteSelectionButton.setToolTipText(Strings.HELP_REMOVE_SELECTION_TOOLTIP.text());
+    deleteSelectionButton.addActionListener(e -> Tasks.removeSelectedEntriesFromPlaylist(mediator));
+    add(deleteSelectionButton);   
+    
+    addSeparator();
+    
     JButton sortButton = new JButton(Icon.SORT_AZ.icon(24));
     sortButton.setToolTipText(Strings.HELP_SORT_PLAYLIST_TOOLTIP.text());
     sortButton.addActionListener(e -> Tasks.sortPlaylistAlphabetically(mediator));
     add(sortButton);
     
-    addSeparator();
+    JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
+    relativize.setToolTipText(Strings.HELP_RELATIVIZE_TO_RETROARCH.text());
+    relativize.addActionListener(e -> Tasks.relativizePathsToRetroarch(mediator));
+    add(relativize);
     
-    JButton deleteSelectionButton = new JButton(Icon.DELETE_SELECTION.icon(24));
-    deleteSelectionButton.setToolTipText(Strings.HELP_REMOVE_SELECTION_TOOLTIP.text());
-    deleteSelectionButton.addActionListener(e -> Tasks.removeSelectedEntriesFromPlaylist(mediator));
-    add(deleteSelectionButton);   
+    JButton makeAbsolute = new JButton(Icon.MAKE_ABSOLUTE.icon(24));
+    makeAbsolute.setToolTipText(Strings.HELP_MAKE_ABSOLUTE_PATHS.text());
+    makeAbsolute.addActionListener(e -> Tasks.makePathsAbsolute(mediator));
+    add(makeAbsolute);
   
     setFloatable(false);
   }

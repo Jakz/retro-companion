@@ -70,7 +70,14 @@ public class Main
   
   private static class MyMediator implements Mediator
   {
-
+    @Override
+    public void refreshPlaylist()
+    {
+      playlistPanel.refresh();
+      entryInfoPanel.setEntry(null);
+    }
+    
+    
     @Override
     public void onEntrySelected(Entry entry)
     {
@@ -94,7 +101,7 @@ public class Main
         .filter(i -> i != -1)
         .forEach(playlist::remove);
   
-      selectPlaylist(playlist);   
+      refreshPlaylist();
     }
     
     @Override

@@ -30,6 +30,11 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     entries.add(entry);
   }
   
+  public Path path()
+  {
+    return path;
+  }
+  
   public String name()
   {
     return FileUtils.fileNameWithoutExtension(path);

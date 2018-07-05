@@ -10,7 +10,11 @@ import org.imgscalr.Scalr;
 public enum Icon
 {
   SORT_AZ("sort_az"),
-  DELETE_SELECTION("delete_selection")
+  DELETE_ENTRY("delete_entry"),
+  ADD_ENTRY("add_entry"),
+  RELATIVIZE("relativize"),
+  MAKE_ABSOLUTE("make_absolute"),
+  SAVE("save")
   ;
   
   private final String name;
