@@ -29,6 +29,7 @@ public class Toolbar extends JToolBar
       
       if (playlist != null)
       {
+        //TODO: localize
         boolean confirmed = !mediator.options().showConfirmationDialogForUndoableOperations || UIUtils.showConfirmDialog(
             Toolbar.this.getParent(),
             "Warning",
@@ -54,6 +55,25 @@ public class Toolbar extends JToolBar
     JButton deleteSelectionButton = new JButton(Icon.DELETE_SELECTION.icon(24));
     deleteSelectionButton.setToolTipText(Strings.HELP_REMOVE_SELECTION_TOOLTIP.text());
     add(deleteSelectionButton);
+    
+    deleteSelectionButton.addActionListener(e -> {
+      Playlist playlist = mediator.playlist();
+      List<Entry> entries = mediator.getSelectedEntries();
+      
+      if (playlist != null && !entries.isEmpty())
+      {
+        //TODO: localize
+        boolean confirmed = !mediator.options().showConfirmationDialogForUndoableOperations || UIUtils.showConfirmDialog(
+            Toolbar.this.getParent(),
+            "Warning",
+            "This can't be undone, are you sure you want to proceed?"
+        );
+        
+        if (confirmed)
+          mediator.removeEntriesFromPlaylist(entries);
+      }
+      
+    });
     
     setFloatable(false);
   }

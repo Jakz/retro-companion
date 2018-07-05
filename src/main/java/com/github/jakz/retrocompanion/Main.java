@@ -83,10 +83,29 @@ public class Main
     }
     
     @Override
+    public void removeEntriesFromPlaylist(List<Entry> entries)
+    {
+      Playlist playlist = playlist();
+      
+      entries.stream()
+        .map(playlist::indexOf)
+        .filter(i -> i != -1)
+        .forEach(playlist::remove);
+  
+      selectPlaylist(playlist);   
+    }
+    
+    @Override
     public void selectEntry(Entry entry)
     {
       if (playlistPanel.selectEntry(entry));
         onEntrySelected(entry);
+    }
+    
+    @Override
+    public List<Entry> getSelectedEntries()
+    {
+      return playlistPanel.getSelectedEntries();
     }
     
     @Override

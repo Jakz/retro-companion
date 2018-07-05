@@ -6,9 +6,12 @@ import java.awt.Component;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -158,6 +161,16 @@ public class PlaylistTablePanel extends JPanel
     {
       e.printStackTrace();
     }
+  }
+  
+  public List<Entry> getSelectedEntries()
+  {
+    int[] rows = table.getSelectedRows();
+        
+    return Arrays.stream(rows)
+        .map(table::convertRowIndexToModel)
+        .mapToObj(playlist::get)
+        .collect(Collectors.toList());
   }
   
   public boolean selectEntry(Entry entry)
