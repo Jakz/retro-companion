@@ -27,6 +27,7 @@ public class Entry
   }
     
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
+  public Playlist playlist() { return playlist; }
   
   public void setCore(Optional<Core.Ref> core) { this.core = core; }
   public Optional<Core.Ref> core() { return core; } 

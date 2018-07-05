@@ -34,6 +34,7 @@ import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
+import com.pixbits.lib.ui.table.SimpleListSelectionListener;
 import com.pixbits.lib.ui.table.TableModel;
 import com.pixbits.lib.ui.table.TableRowTransferHandler;
 import com.pixbits.lib.ui.table.editors.PathArgumentEditor;
@@ -41,6 +42,7 @@ import com.pixbits.lib.ui.table.renderers.DefaultTableAndListRenderer;
 
 public class PlaylistTablePanel extends JPanel
 {
+  private final Mediator mediator;
   private final Options options;
   
   private JTable table;
@@ -48,8 +50,9 @@ public class PlaylistTablePanel extends JPanel
   private Playlist playlist;
   
   @SuppressWarnings("unchecked")
-  public PlaylistTablePanel(Options options)
+  public PlaylistTablePanel(Mediator mediator, Options options)
   {
+    this.mediator = mediator;
     this.options = options;
     
     table = new JTable();
@@ -143,6 +146,10 @@ public class PlaylistTablePanel extends JPanel
       coreColumn.setEditor(new DefaultCellEditor(comboBox));
             
       model.fireTableStructureChanged();
+      
+      table.getSelectionModel().addListSelectionListener(SimpleListSelectionListener.ofJustSingle(i -> {
+        mediator.onEntrySelected(i != -1 ? model.data().get(i) : null);      
+      }));
     }
     catch (Exception e)
     {

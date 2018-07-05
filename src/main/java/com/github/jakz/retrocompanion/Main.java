@@ -9,18 +9,21 @@ import java.util.List;
 
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
+import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.github.jakz.retrocompanion.parsers.CoreParser;
 import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.CoreTablePanel;
+import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
+import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.PathsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.WrapperFrame;
 
 public class Main 
-{
+{  
   public static final Path OPTIONS_PATH = Paths.get("options.json");
   
   public static Options options = new Options();
@@ -57,10 +60,25 @@ public class Main
     }
   }
   
+  private static EntryInfoPanel entryInfoPanel;
+  
+  private static class MyMediator implements Mediator
+  {
+
+    @Override
+    public void onEntrySelected(Entry entry)
+    {
+      entryInfoPanel.setEntry(entry);
+    }
+    
+  }
+  
   public static void main(String[] args)
   {
     try
     {
+      MyMediator mediator = new MyMediator();
+      
       UIUtils.setNimbusLNF();
       
       CoreSet cores = new CoreParser().parse(options);
@@ -78,7 +96,7 @@ public class Main
       Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
       //Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
       
-      PlaylistTablePanel playlistPanel = new PlaylistTablePanel(options);
+      PlaylistTablePanel playlistPanel = new PlaylistTablePanel(mediator, options);
       WrapperFrame<?> playlistFrame = UIUtils.buildFrame(playlistPanel, "Playlist");
       
       playlistPanel.setPlaylist(playlist);
@@ -86,6 +104,14 @@ public class Main
       playlistFrame.exitOnClose();
       playlistFrame.centerOnScreen();
       playlistFrame.setVisible(true);
+      
+      {
+        entryInfoPanel = new EntryInfoPanel(options);
+        WrapperFrame<?> entryInfoFrame = UIUtils.buildFrame(entryInfoPanel, "Entry Info");
+        
+        entryInfoFrame.centerOnScreen();
+        entryInfoFrame.setVisible(true);
+      }
       
       if (true)
         return;
