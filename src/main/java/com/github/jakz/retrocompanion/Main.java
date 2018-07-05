@@ -1,5 +1,7 @@
 package com.github.jakz.retrocompanion;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -118,6 +120,12 @@ public class Main
     public Options options()
     {
       return options;
+    }
+    
+    @Override
+    public Container modalTarget()
+    {
+      return mainPanel;
     }
   }
   

@@ -1,5 +1,6 @@
 package com.github.jakz.retrocompanion.ui;
 
+import java.awt.Container;
 import java.util.List;
 
 import com.github.jakz.retrocompanion.Options;
@@ -18,4 +19,6 @@ public interface Mediator
   
   public Playlist playlist();
   public Options options();
+  
+  public Container modalTarget();
 }
