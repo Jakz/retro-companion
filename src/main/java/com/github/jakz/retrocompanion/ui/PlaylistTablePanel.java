@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 import javax.swing.DefaultCellEditor;
+import javax.swing.DropMode;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
@@ -34,6 +35,7 @@ import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
 import com.pixbits.lib.ui.table.TableModel;
+import com.pixbits.lib.ui.table.TableRowTransferHandler;
 import com.pixbits.lib.ui.table.editors.PathArgumentEditor;
 import com.pixbits.lib.ui.table.renderers.DefaultTableAndListRenderer;
 
@@ -52,6 +54,10 @@ public class PlaylistTablePanel extends JPanel
     
     table = new JTable();
     model = new Model(table);
+    
+    table.setDragEnabled(true);
+    table.setDropMode(DropMode.INSERT_ROWS);
+    table.setTransferHandler(new TableRowTransferHandler(model));
     
     setLayout(new BorderLayout());
     add(new JScrollPane(table), BorderLayout.CENTER);

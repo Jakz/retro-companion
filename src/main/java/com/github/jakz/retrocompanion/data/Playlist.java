@@ -11,8 +11,9 @@ import java.util.stream.Stream;
 
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.ui.table.DataSource;
+import com.pixbits.lib.ui.table.ModifiableDataSource;
 
-public class Playlist implements Iterable<Entry>, DataSource<Entry>
+public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
 {
   private Path path;
   
@@ -68,4 +69,10 @@ public class Playlist implements Iterable<Entry>, DataSource<Entry>
 
   @Override
   public int indexOf(Entry entry) { return entries.indexOf(entry); }
+
+  @Override
+  public void add(int index, Entry element) { entries.add(index, element); }
+
+  @Override
+  public void remove(int index) { entries.remove(index); }
 }
