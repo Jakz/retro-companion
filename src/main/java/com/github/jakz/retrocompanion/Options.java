@@ -32,6 +32,7 @@ public class Options
   public boolean autoFixPlaylistNamesInEntries;
   public boolean overwriteThumbnailWithoutConfirmation;
   public boolean thumbnailMoveInsteadThanCopy;
+  public boolean showConfirmationDialogForUndoableOperations;
   
   /* TODO: we're passing it here but maybe there's a better place */
   public transient CoreSet cores;
@@ -44,6 +45,7 @@ public class Options
     autoFixPlaylistNamesInEntries = true;
     overwriteThumbnailWithoutConfirmation = true;
     thumbnailMoveInsteadThanCopy = false;
+    showConfirmationDialogForUndoableOperations = true;
   }
   
   public void derivePathsFromRetroarch()

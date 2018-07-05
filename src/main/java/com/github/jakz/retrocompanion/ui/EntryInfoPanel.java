@@ -31,7 +31,8 @@ public class EntryInfoPanel extends JPanel
   private final int THUMBNAIL_SIZE = 120;
   private final int THUMBNAIL_MARGIN = 10;
   
-  private Options options;
+  private Mediator mediator;
+  
   private Entry entry;
   
   private JLabel[] thumbnails;
@@ -41,11 +42,11 @@ public class EntryInfoPanel extends JPanel
   private final ThumbnailPopupMenu thumbnailPopupMenu;
   
   private ThumbnailType[] enabledThumbnails() { return ThumbnailType.values(); }
-  private Path pathForThumbnail(ThumbnailType type) { return entry != null ? options.pathForThumbnail(entry.playlist(), type, entry) : null; }
+  private Path pathForThumbnail(ThumbnailType type) { return entry != null ? mediator.options().pathForThumbnail(entry.playlist(), type, entry) : null; }
   
-  public EntryInfoPanel(Options options)
+  public EntryInfoPanel(Mediator mediator)
   {
-    this.options = options;
+    this.mediator = mediator;
     
     thumbnailPopupMenu = new ThumbnailPopupMenu();
     
@@ -121,7 +122,7 @@ public class EntryInfoPanel extends JPanel
         {
           ThumbnailType type = enabledThumbnails()[i];
           
-          Path boxartPath = options.pathForThumbnail(entry.playlist(), type, entry);
+          Path boxartPath = mediator.options().pathForThumbnail(entry.playlist(), type, entry);
           
           if (Files.exists(boxartPath))
           {
@@ -143,6 +144,9 @@ public class EntryInfoPanel extends JPanel
       {
         entryName.setText("Name:");
         entryPath.setText("Path:");
+        
+        for (JLabel thumbnail : thumbnails)
+          thumbnail.setIcon(null);
         
         //for (JLabel thumbnail : thumbnails)
           //thumbnail.setVerticalTextPosition(JLabel.CENTER);
@@ -179,7 +183,7 @@ public class EntryInfoPanel extends JPanel
             
             if (Files.exists(dest))
             {
-              if (options.overwriteThumbnailWithoutConfirmation)
+              if (mediator.options().overwriteThumbnailWithoutConfirmation)
                 Files.delete(dest);
               else
               {
@@ -189,7 +193,7 @@ public class EntryInfoPanel extends JPanel
             
             Files.createDirectories(dest.getParent());
             
-            if (options.thumbnailMoveInsteadThanCopy)
+            if (mediator.options().thumbnailMoveInsteadThanCopy)
               Files.move(source, dest);
             else
               Files.copy(source, dest);
@@ -219,6 +223,7 @@ public class EntryInfoPanel extends JPanel
         {
           Path path = pathForThumbnail(type);
           
+          //TODO: confirmation?
           if (path != null && Files.exists(path))
             Files.delete(path);
           

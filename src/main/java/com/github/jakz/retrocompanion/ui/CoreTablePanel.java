@@ -17,15 +17,15 @@ import com.pixbits.lib.ui.table.TableModel;
 
 public class CoreTablePanel extends JPanel
 {
-  private final Options options;
+  private final Mediator mediator;
   
   private JTable table;
   private Model model;
   private DataSource<Core> cores;
   
-  public CoreTablePanel(Options options)
+  public CoreTablePanel(Mediator mediator)
   {
-    this.options = options;
+    this.mediator = mediator;
     
     table = new JTable();
     table.setAutoCreateRowSorter(true);

@@ -75,4 +75,7 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
 
   @Override
   public void remove(int index) { entries.remove(index); }
+  
+  @Override
+  public void clear() { entries.clear(); }
 }

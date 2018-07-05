@@ -50,10 +50,10 @@ public class PlaylistTablePanel extends JPanel
   private Playlist playlist;
   
   @SuppressWarnings("unchecked")
-  public PlaylistTablePanel(Mediator mediator, Options options)
+  public PlaylistTablePanel(Mediator mediator)
   {
     this.mediator = mediator;
-    this.options = options;
+    this.options = mediator.options();
     
     table = new JTable();
     model = new Model(table);
@@ -160,11 +160,34 @@ public class PlaylistTablePanel extends JPanel
     }
   }
   
+  public boolean selectEntry(Entry entry)
+  {
+    if (playlist != null)
+    {
+      int index = playlist.indexOf(entry);
+      
+      if (index != -1)
+      {
+        int aindex = table.convertRowIndexToView(index);
+        table.getSelectionModel().setSelectionInterval(aindex, aindex);
+        return true;
+      }
+    }
+    
+    return false;
+  }
+  
   public void setPlaylist(Playlist playlist)
   {
     this.playlist = playlist;
+    table.clearSelection();
     model.setData(playlist);
     model.fireTableDataChanged();
+  }
+  
+  public Playlist playlist()
+  {
+    return playlist;
   }
   
   

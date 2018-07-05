@@ -13,14 +13,14 @@ import com.pixbits.lib.ui.elements.BrowseButton;
 
 public class PathsPanel extends JPanel
 {
-  private final Options options;
+  private final Mediator mediator;
   
   private final String[] captions = { "RetroArch Path", "Cores Path", "Info Path", "Playlists Path", "Thumbnails Path"};
   private final BrowseButton[] browseFields;
     
-  public PathsPanel(Options options)
+  public PathsPanel(Mediator mediator)
   {
-    this.options = options;
+    this.mediator = mediator;
     final int count = captions.length;
     
     this.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Paths"), BorderFactory.createEmptyBorder(5,5,5,5)));
@@ -45,13 +45,15 @@ public class PathsPanel extends JPanel
     
     browseFields[0].setCallback(p -> {
       onPathChanged();
-      options.derivePathsFromRetroarch();
+      mediator.options().derivePathsFromRetroarch();
     });
     
   }
   
   public void refresh()
   {
+    Options options = mediator.options();
+    
     browseFields[0].setText(options.retroarchPath.toString());
     browseFields[1].setText(options.coresPath.toString());
     browseFields[2].setText(options.infoPath.toString());
@@ -61,6 +63,8 @@ public class PathsPanel extends JPanel
   
   private void onPathChanged()
   {
+    Options options = mediator.options();
+    
     options.retroarchPath = browseFields[0].getPath();
     options.coresPath = browseFields[1].getPath();
     options.infoPath = browseFields[2].getPath();

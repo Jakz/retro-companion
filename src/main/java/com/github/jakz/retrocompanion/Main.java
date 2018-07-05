@@ -16,6 +16,7 @@ import com.github.jakz.retrocompanion.parsers.CoreParser;
 import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
+import com.github.jakz.retrocompanion.ui.MainPanel;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.PathsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
@@ -60,7 +61,10 @@ public class Main
     }
   }
   
+  private static MainPanel mainPanel;
+  
   private static EntryInfoPanel entryInfoPanel;
+  private static PlaylistTablePanel playlistPanel;
   
   private static class MyMediator implements Mediator
   {
@@ -71,6 +75,31 @@ public class Main
       entryInfoPanel.setEntry(entry);
     }
     
+    @Override
+    public void selectPlaylist(Playlist playlist)
+    {
+      playlistPanel.setPlaylist(playlist);
+      entryInfoPanel.setEntry(null);
+    }
+    
+    @Override
+    public void selectEntry(Entry entry)
+    {
+      if (playlistPanel.selectEntry(entry));
+        onEntrySelected(entry);
+    }
+    
+    @Override
+    public Playlist playlist()
+    {
+      return playlistPanel.playlist();
+    }
+    
+    @Override
+    public Options options()
+    {
+      return options;
+    }
   }
   
   public static void main(String[] args)
@@ -83,7 +112,7 @@ public class Main
       
       CoreSet cores = new CoreParser().parse(options);
       options.cores = cores;
-      CoreTablePanel coresPanel = new CoreTablePanel(options);
+      CoreTablePanel coresPanel = new CoreTablePanel(mediator);
       coresPanel.setCores(cores);
       
       WrapperFrame<?> coresFrame = UIUtils.buildFrame(coresPanel, "Cores");
@@ -96,22 +125,24 @@ public class Main
       Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
       //Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
       
-      PlaylistTablePanel playlistPanel = new PlaylistTablePanel(mediator, options);
-      WrapperFrame<?> playlistFrame = UIUtils.buildFrame(playlistPanel, "Playlist");
-      
-      playlistPanel.setPlaylist(playlist);
+      mainPanel = new MainPanel(mediator);
+      Main.playlistPanel = mainPanel.playlistPanel;
 
-      playlistFrame.exitOnClose();
-      playlistFrame.centerOnScreen();
-      playlistFrame.setVisible(true);
+      WrapperFrame<?> mainFrame = UIUtils.buildFrame(mainPanel, "Playlist");
+
+      mainFrame.exitOnClose();
+      mainFrame.centerOnScreen();
+      mainFrame.setVisible(true);
       
       {
-        entryInfoPanel = new EntryInfoPanel(options);
+        entryInfoPanel = new EntryInfoPanel(mediator);
         WrapperFrame<?> entryInfoFrame = UIUtils.buildFrame(entryInfoPanel, "Entry Info");
         
         entryInfoFrame.centerOnScreen();
         entryInfoFrame.setVisible(true);
       }
+      
+      mediator.selectPlaylist(playlist);
       
       if (true)
         return;
@@ -125,13 +156,5 @@ public class Main
     
     if (true)
       return;
-    
-    
-    WrapperFrame<?> frame = UIUtils.buildFrame(new PathsPanel(options), "Paths");
-
-    frame.exitOnClose();
-    frame.centerOnScreen();
-    frame.setVisible(true);
-
   }
 }
