@@ -9,6 +9,7 @@ import com.github.jakz.retrocompanion.data.Playlist;
 
 public interface Mediator
 {
+  public void scanAndLoadPlaylists();  
   public void refreshPlaylist();
   
   public void onEntrySelected(Entry entry);

@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.github.jakz.retrocompanion.data.Core;
@@ -63,6 +64,8 @@ public class Main
     }
   }
   
+  private static final List<Playlist> playlists = new ArrayList<>();
+  
   private static MainPanel mainPanel;
   
   private static EntryInfoPanel entryInfoPanel;
@@ -70,6 +73,21 @@ public class Main
   
   private static class MyMediator implements Mediator
   {
+    @Override
+    public void scanAndLoadPlaylists()
+    {
+      if (Files.exists(options().playlistsPath))
+      {
+        List<Playlist> playlists = Tasks.Standalone.loadPlaylistsFromFolder(options().playlistsPath, options);
+        playlists.sort((p1, p2) -> p1.path().compareTo(p2.path()));
+        
+        Main.playlists.clear();
+        Main.playlists.addAll(playlists);
+        mainPanel.playlistChooser.removeAllItems();
+        Main.playlists.forEach(mainPanel.playlistChooser::addItem);
+      }
+    }
+    
     @Override
     public void refreshPlaylist()
     {
@@ -155,8 +173,8 @@ public class Main
       coresFrame.centerOnScreen();
       coresFrame.setVisible(true);
       
-      PlaylistParser parser = new PlaylistParser(options);
-      Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
+      //PlaylistParser parser = new PlaylistParser(options);
+      //Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
       //Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
       
       mainPanel = new MainPanel(mediator);
@@ -176,12 +194,9 @@ public class Main
         entryInfoFrame.setVisible(true);
       }
       
-      mediator.selectPlaylist(playlist);
-      
-      if (true)
-        return;
-
-      playlist.save(Paths.get("test.lpl"));
+      mediator.scanAndLoadPlaylists();
+      if (!playlists.isEmpty())
+        mediator.selectPlaylist(playlists.get(0));
     } 
     catch (IOException e)
     {

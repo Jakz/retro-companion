@@ -1,18 +1,24 @@
 package com.github.jakz.retrocompanion;
 
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.Toolbar;
+import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.UIUtils;
 
 public class Tasks
@@ -50,9 +56,25 @@ public class Tasks
         e.printStackTrace();
       }
     }
+    
+    public static List<Playlist> loadPlaylistsFromFolder(Path folder, Options options)
+    {
+      try
+      {
+        FolderScanner scanner = new FolderScanner(FileSystems.getDefault().getPathMatcher("glob:*.lpl"), false);
+        
+        Set<Path> playlists = scanner.scan(folder);
+        PlaylistParser parser = new PlaylistParser(options);
+        
+        return playlists.stream().map(parser::parse).collect(Collectors.toList());
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace();
+        return Collections.emptyList();
+      }
+    }
   }
-  
-
   
   public static void removeSelectedEntriesFromPlaylist(Mediator mediator)
   {

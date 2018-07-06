@@ -25,6 +25,11 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     entries = new ArrayList<>();
   }
   
+  public String toString()
+  {
+    return path.getFileName().toString();
+  }
+  
   public void add(Entry entry)
   {
     entries.add(entry);
