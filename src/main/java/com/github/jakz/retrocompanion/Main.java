@@ -92,7 +92,25 @@ public class Main
     public void refreshPlaylist()
     {
       playlistPanel.refresh();
+      mainPanel.playlistChooser.repaint();
       entryInfoPanel.setEntry(null);
+    }
+    
+    @Override
+    public void addPlaylist(Playlist playlist)
+    {
+      playlists.add(playlist);
+      playlists.sort((p1, p2) -> p1.path().compareTo(p2.path()));
+      
+      mainPanel.playlistChooser.removeAllItems();
+      Main.playlists.forEach(mainPanel.playlistChooser::addItem);
+    }
+    
+    @Override
+    public void removePlaylist(Playlist playlist)
+    {
+      playlists.remove(playlist);
+      mainPanel.playlistChooser.removeItem(playlist);
     }
     
     
@@ -105,7 +123,15 @@ public class Main
     @Override
     public void selectPlaylist(Playlist playlist)
     {
+      mainPanel.playlistChooser.setSelectedItem(playlist);
+      onPlaylistSelected(playlist);
+    }
+    
+    @Override
+    public void onPlaylistSelected(Playlist playlist)
+    {
       playlistPanel.setPlaylist(playlist);
+      mainPanel.playlistChooser.repaint();
       entryInfoPanel.setEntry(null);
     }
     
@@ -179,20 +205,13 @@ public class Main
       
       mainPanel = new MainPanel(mediator);
       Main.playlistPanel = mainPanel.playlistPanel;
+      Main.entryInfoPanel = mainPanel.entryInfoPanel;
 
       WrapperFrame<?> mainFrame = UIUtils.buildFrame(mainPanel, "Playlist");
 
       mainFrame.exitOnClose();
       mainFrame.centerOnScreen();
       mainFrame.setVisible(true);
-      
-      {
-        entryInfoPanel = new EntryInfoPanel(mediator);
-        WrapperFrame<?> entryInfoFrame = UIUtils.buildFrame(entryInfoPanel, "Entry Info");
-        
-        entryInfoFrame.centerOnScreen();
-        entryInfoFrame.setVisible(true);
-      }
       
       mediator.scanAndLoadPlaylists();
       if (!playlists.isEmpty())

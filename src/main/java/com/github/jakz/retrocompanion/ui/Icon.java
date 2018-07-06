@@ -14,7 +14,9 @@ public enum Icon
   ADD_ENTRY("add_entry"),
   RELATIVIZE("relativize"),
   MAKE_ABSOLUTE("make_absolute"),
-  SAVE("save")
+  SAVE("save"),
+  NEW_PLAYLIST("new"),
+  DELETE_PLAYLIST("delete")
   ;
   
   private final String name;

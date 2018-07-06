@@ -201,7 +201,7 @@ public class PlaylistTablePanel extends JPanel
   {
     this.playlist = playlist;
     table.clearSelection();
-    model.setData(playlist);
+    model.setData(playlist != null ? playlist : DataSource.empty());
     refresh();
   }
   

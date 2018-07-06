@@ -1,16 +1,24 @@
 package com.github.jakz.retrocompanion.ui;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileFilter;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.Tasks;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
+import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.ui.UIUtils;
 
 public class Toolbar extends JToolBar 
@@ -20,6 +28,94 @@ public class Toolbar extends JToolBar
   public Toolbar(Mediator mediator)
   {
     this.mediator = mediator;
+    
+    JButton newPlaylist = new JButton(Icon.NEW_PLAYLIST.icon(24));
+    newPlaylist.setToolTipText("New playlist"); //TODO: localize
+    newPlaylist.addActionListener(e -> {
+      if (!Files.exists(mediator.options().playlistsPath))
+        UIUtils.showErrorDialog(mediator.modalTarget(), "Error", "Playlist path doesn't exists!"); //TODO: localize
+      else
+      {
+        JFileChooser chooser = new JFileChooser();
+  
+        chooser.setCurrentDirectory(mediator.options().playlistsPath.toFile());
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        chooser.setFileFilter(new FileFilter() {
+          @Override
+          public boolean accept(File f) { return f.getName().endsWith(".lpl"); }
+
+          @Override
+          public String getDescription() { return "Playlist Files (*.lpl)"; }
+          
+        });
+        
+        int result = chooser.showSaveDialog(mediator.modalTarget());
+        
+        if (result == JFileChooser.APPROVE_OPTION)
+        {
+          String file = chooser.getSelectedFile().getAbsoluteFile().toString();
+
+          if (!file.endsWith(".lpl"))
+            file = FileUtils.trimExtension(file) + ".lpl";
+          
+          Path path = Paths.get(file);
+          
+          if (Files.exists(path))
+            UIUtils.showErrorDialog(mediator.modalTarget(), "Error", "A playlist with the same name already exists!"); //TODO: localize
+          else
+          {
+            try 
+            {
+              Files.createFile(path);
+              Playlist playlist = new Playlist(path);
+              mediator.addPlaylist(playlist);
+              mediator.selectPlaylist(playlist);
+            }
+            catch (IOException ex)
+            {
+              ex.printStackTrace();
+            }
+          }
+        }
+      }
+      
+
+      
+    });
+    add(newPlaylist);
+    
+    JButton deletePlaylist = new JButton(Icon.DELETE_PLAYLIST.icon(24));
+    deletePlaylist.setToolTipText("Delete current playlist"); //TODO: localize
+    deletePlaylist.addActionListener(e -> {
+      Playlist playlist = mediator.playlist();
+      
+      if (playlist != null)
+      {
+        //TODO: maybe ignore the setting?
+        boolean confirmed = !mediator.options().showConfirmationDialogForUndoableOperations || UIUtils.showConfirmDialog(
+            mediator.modalTarget(),
+            "Warning",
+            "Deleting a playlist can't be undone, do you want to proceed?"
+        );
+        
+        if (confirmed)
+        {
+          try
+          {
+            if (Files.exists(playlist.path()))
+              Files.delete(playlist.path());
+            
+            mediator.removePlaylist(playlist);
+            mediator.selectPlaylist(null);
+          }
+          catch (IOException ex)
+          {
+            ex.printStackTrace();
+          }
+        }
+      }
+    });
+    add(deletePlaylist);
 
     JButton save = new JButton(Icon.SAVE.icon(24));
     save.setToolTipText("Save playlist"); //TODO: localize

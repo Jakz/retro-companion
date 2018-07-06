@@ -11,10 +11,13 @@ public interface Mediator
 {
   public void scanAndLoadPlaylists();  
   public void refreshPlaylist();
-  
+  public void addPlaylist(Playlist playlist);
+  public void removePlaylist(Playlist playlist);
+  public void selectPlaylist(Playlist playlist);
+
+  public void onPlaylistSelected(Playlist playlist);
   public void onEntrySelected(Entry entry);
   
-  public void selectPlaylist(Playlist playlist);
   public void selectEntry(Entry entry);
   
   public List<Entry> getSelectedEntries();
