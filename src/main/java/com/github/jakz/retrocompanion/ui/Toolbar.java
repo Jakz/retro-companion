@@ -141,6 +141,16 @@ public class Toolbar extends JToolBar
     sortButton.addActionListener(e -> Tasks.sortPlaylistAlphabetically(mediator));
     add(sortButton);
     
+    JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));
+    removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
+    removeTags.addActionListener(e -> Tasks.removeAllTagsFromEntryNames(mediator));
+    add(removeTags);
+    
+    JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(24));
+    renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
+    renameToFilename.addActionListener(e -> Tasks.renameEntriesToMatchFilename(mediator));
+    add(renameToFilename);
+
     JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
     relativize.setToolTipText(Strings.HELP_RELATIVIZE_TO_RETROARCH.text());
     relativize.addActionListener(e -> Tasks.relativizePathsToRetroarch(mediator));

@@ -24,6 +24,7 @@ public interface Mediator
   public void removeEntriesFromPlaylist(List<Entry> entries);
   
   public Playlist playlist();
+  public Entry entry();
   public Options options();
   
   public Container modalTarget();

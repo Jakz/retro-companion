@@ -168,6 +168,12 @@ public class Main
     }
     
     @Override
+    public Entry entry()
+    {
+      return entryInfoPanel.entry();
+    }
+    
+    @Override
     public Options options()
     {
       return options;
@@ -207,7 +213,7 @@ public class Main
       Main.playlistPanel = mainPanel.playlistPanel;
       Main.entryInfoPanel = mainPanel.entryInfoPanel;
 
-      WrapperFrame<?> mainFrame = UIUtils.buildFrame(mainPanel, "Playlist");
+      WrapperFrame<?> mainFrame = UIUtils.buildFrame(mainPanel, "RetroCompanion v0.1");
 
       mainFrame.exitOnClose();
       mainFrame.centerOnScreen();

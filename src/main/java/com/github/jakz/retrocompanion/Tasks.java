@@ -18,6 +18,7 @@ import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.Toolbar;
+import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.UIUtils;
 
@@ -166,5 +167,51 @@ public class Tasks
     }
     else
       UIUtils.showErrorDialog(mediator.modalTarget(), "Error", "Retroarch path doesn't exist");
+  }
+  
+  public static void removeAllTagsFromEntryNames(Mediator mediator)
+  {
+    Playlist playlist = mediator.playlist();
+
+    if (playlist != null)
+    {
+      for (Entry entry : playlist)
+      {
+        String name = entry.name();
+        int firstTagIndex = name.indexOf('(');
+        
+        if (firstTagIndex != -1 && firstTagIndex > 0)
+        {
+          String newName = name.substring(0, firstTagIndex-1);
+          
+          entry.rename(newName, mediator.options());
+        }
+      }
+      
+      Entry selectedEntry = mediator.entry();
+      mediator.refreshPlaylist();
+      mediator.selectEntry(selectedEntry);
+    }
+  }
+  
+  public static void renameEntriesToMatchFilename(Mediator mediator)
+  {
+    Playlist playlist = mediator.playlist();
+
+    if (playlist != null)
+    {
+      for (Entry entry : playlist)
+      {
+        String name = entry.name();
+        String newName = FileUtils.fileNameWithoutExtension(entry.path);
+        
+        if (!name.equals(newName))      
+          entry.rename(newName, mediator.options());
+      }
+      
+      Entry selectedEntry = mediator.entry();
+      mediator.refreshPlaylist();
+      mediator.selectEntry(selectedEntry);
+    }
   }
 }

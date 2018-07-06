@@ -9,14 +9,20 @@ import org.imgscalr.Scalr;
 
 public enum Icon
 {
-  SORT_AZ("sort_az"),
+  
   DELETE_ENTRY("delete_entry"),
   ADD_ENTRY("add_entry"),
+  
+  SORT_AZ("sort_az"),
   RELATIVIZE("relativize"),
   MAKE_ABSOLUTE("make_absolute"),
+  REMOVE_TAGS("remove_tags"),
+  RENAME_TO_FILENAME("rename_to_filename"),
+  
   SAVE("save"),
   NEW_PLAYLIST("new"),
   DELETE_PLAYLIST("delete")
+  
   ;
   
   private final String name;

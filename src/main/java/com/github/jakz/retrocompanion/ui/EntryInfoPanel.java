@@ -160,6 +160,11 @@ public class EntryInfoPanel extends JPanel
     }
   }
   
+  public Entry entry()
+  {
+    return entry;
+  }
+  
   private class ThumbnailDragDropListener implements FileTransferHandler.Listener
   {
     private final ThumbnailType type;

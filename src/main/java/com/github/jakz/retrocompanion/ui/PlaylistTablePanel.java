@@ -4,12 +4,17 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayDeque;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -38,7 +43,9 @@ import com.github.jakz.retrocompanion.data.DBRef;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.FileTransferHandler;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
@@ -68,10 +75,14 @@ public class PlaylistTablePanel extends JPanel
     
     table.setDragEnabled(true);
     table.setDropMode(DropMode.INSERT_ROWS);
-    table.setTransferHandler(new TableRowTransferHandler(model));
+    table.setTransferHandler(new TableRowTransferHandler<Entry>(model));
+    table.setFillsViewportHeight(true);
+
+    JScrollPane tablePane = new JScrollPane(table);
+    tablePane.setPreferredSize(new Dimension(800, 400));
     
     setLayout(new BorderLayout());
-    add(new JScrollPane(table), BorderLayout.CENTER);
+    add(tablePane, BorderLayout.CENTER);
     
     try
     {
@@ -91,12 +102,9 @@ public class PlaylistTablePanel extends JPanel
           mediator.onEntrySelected(e);
         }
       });
+      nameColumn.setWidth(250);
       nameColumn.setEditable(true);
       model.addColumn(nameColumn);
-            
-      ColumnSpec<Entry, Path> pathColumn = new ColumnSpec<Entry, Path>("Path", Entry.class.getField("path"), true);
-      pathColumn.setEditor(new PathArgumentEditor(JFileChooser.FILES_ONLY));
-      model.addColumn(pathColumn);
       
       final String[] thumbnailCaptions = { "B", "S", "T" };
       final ThumbnailType[] thumbnailType = { ThumbnailType.BOXART, ThumbnailType.SNAP, ThumbnailType.TITLE };
@@ -104,7 +112,10 @@ public class PlaylistTablePanel extends JPanel
       for (int i = 0; i < 1/*ThumbnailType.values().length*/; ++i)
       {
         final ThumbnailType tt = thumbnailType[i];
-        model.addColumn(new ColumnSpec<>(thumbnailCaptions[i], boolean.class, e -> Files.exists(options.pathForThumbnail(playlist, tt, e))));
+        
+        ColumnSpec<Entry, ?> thumbnailColumn = new ColumnSpec<>(thumbnailCaptions[i], boolean.class, e -> Files.exists(options.pathForThumbnail(playlist, tt, e)));
+        thumbnailColumn.setWidth(30);
+        model.addColumn(thumbnailColumn);
       }
       
       model.setDefaultRenderer(boolean.class, new DefaultTableCellRenderer() {
@@ -112,6 +123,8 @@ public class PlaylistTablePanel extends JPanel
         public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column)
         {
           JLabel field = (JLabel)super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+          
+          field.setHorizontalAlignment(JLabel.CENTER);
           
           if ((boolean)value)
           {
@@ -127,7 +140,7 @@ public class PlaylistTablePanel extends JPanel
           return field;
         }
       });
-      
+             
       //e.core().map(Core.Ref::shortLibraryName).orElse("DETECT")
       Function<Entry, Optional<Core.Ref>> getter = e -> e.core();
       BiConsumer<Entry, Optional<Core.Ref>> setter = (e,v) -> e.setCore(v.map(Core.Ref::dupe));
@@ -136,7 +149,9 @@ public class PlaylistTablePanel extends JPanel
       
       Stream<Optional<Core.Ref>> cores = Stream.concat(
           Stream.of(Optional.empty()), 
-          options.cores.stream().map(c -> Optional.of(new Core.Ref(c, Optional.empty())))
+          options.cores.stream()
+            .map(c -> Optional.of(new Core.Ref(c, Optional.empty())))
+            .sorted((c1, c2) -> c1.get().shortLibraryName().compareTo(c2.get().shortLibraryName()))
       );
 
 
@@ -145,6 +160,7 @@ public class PlaylistTablePanel extends JPanel
         @Override
         public void decorate(JLabel label, JComponent source, Optional<Core.Ref> value, int index, boolean isSelected, boolean hasFocus)
         {
+          label.setFont(PlaylistTablePanel.this.getFont().deriveFont(PlaylistTablePanel.this.getFont().getSize()*0.8f));
           label.setText(value.map(c -> c.shortLibraryName()).orElse("DETECT"));
         }
       };
@@ -155,7 +171,12 @@ public class PlaylistTablePanel extends JPanel
       coreColumn.setEditable(true);
       coreColumn.setRenderer(renderer);
       coreColumn.setEditor(new DefaultCellEditor(comboBox));
-            
+      coreColumn.setWidth(150);
+      
+      ColumnSpec<Entry, Path> pathColumn = new ColumnSpec<Entry, Path>("Path", Entry.class.getField("path"), true);
+      pathColumn.setEditor(new PathArgumentEditor(JFileChooser.FILES_ONLY));
+      model.addColumn(pathColumn);
+      
       model.fireTableStructureChanged();
       
       table.getSelectionModel().addListSelectionListener(SimpleListSelectionListener.ofJustSingle(i -> {
@@ -240,17 +261,50 @@ public class PlaylistTablePanel extends JPanel
       
       target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
       
-      for (int i = files.length - 1; i >= 0; --i)
+      try
       {
-        Entry entry = new Entry(playlist, files[i], FileUtils.fileNameWithoutExtension(files[i]), Optional.empty(), Optional.empty());
+        recursiveAdd(index, files);
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace();
+      }
+      
+      mediator.refreshPlaylist();
+    }
+    
+    public void recursiveAdd(int index, Path[] start) throws IOException
+    {
+      Deque<Path> deque = new ArrayDeque<>();  
+      FolderScanner scanner = new FolderScanner(FolderScanner.FolderMode.ADD_TO_RESULT);
+      
+      for (Path path : start)
+        deque.addLast(path);
+      
+      while (!deque.isEmpty())
+      {
+        Path path = deque.removeLast();
         
-        if (mediator.options().autoRelativizePathsWhenImporting)
-          entry.relativizePath(mediator.options().retroarchPath);
-        
-        playlist.add(index, entry);
-        mediator.refreshPlaylist();
+        if (Files.isDirectory(path))
+        {
+          Set<Path> children = scanner.scan(path);
+          children.stream()
+            .filter(StreamException.rethrowPredicate(p -> !Files.isHidden(p)))
+            .forEach(deque::addLast);
+        }
+        else
+          addEntry(index, path);
       }
     }
+    
+    public void addEntry(int index, Path path)
+    {
+      Entry entry = new Entry(playlist, path, FileUtils.fileNameWithoutExtension(path), Optional.empty(), Optional.empty());
+      
+      if (mediator.options().autoRelativizePathsWhenImporting)
+        entry.relativizePath(mediator.options().retroarchPath);
+      
+      playlist.add(index, entry);
+    }
   }
-  
 }
