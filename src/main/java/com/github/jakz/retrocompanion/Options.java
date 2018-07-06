@@ -20,6 +20,8 @@ import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParseException;
 import com.pixbits.lib.json.PathAdapter;
+import com.pixbits.lib.ui.UIUtils;
+import com.pixbits.lib.ui.UIUtils.OperatingSystem;
 
 public class Options
 {
@@ -52,10 +54,22 @@ public class Options
   
   public void derivePathsFromRetroarch()
   {
-    playlistsPath = retroarchPath.resolve("playlists");
-    thumbnailsPath = retroarchPath.resolve("thumbnails");
+    OperatingSystem os = UIUtils.getOperatingSystem();
+    
     coresPath = retroarchPath.resolve("cores");
     infoPath = retroarchPath.resolve("info");
+    
+    if (os == OperatingSystem.OSX)
+    {
+      String home = System.getProperty("user.home");
+      playlistsPath = Paths.get(home, "Library/Application Support/RetroArch/playlists");
+      thumbnailsPath = Paths.get(home, "Library/Application Support/RetroArch/thumbnails");
+    }
+    else
+    {
+      playlistsPath = retroarchPath.resolve("playlists");
+      thumbnailsPath = retroarchPath.resolve("thumbnails");
+    }
   }
   
   public Path pathForThumbnail(Playlist playlist, ThumbnailType type, Entry game)

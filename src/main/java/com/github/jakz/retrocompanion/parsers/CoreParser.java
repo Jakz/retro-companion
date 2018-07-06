@@ -3,6 +3,7 @@ package com.github.jakz.retrocompanion.parsers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,9 @@ public class CoreParser
 {
   public CoreSet parse(Options options) throws IOException
   {
+    if (!Files.exists(options.coresPath))
+      return new CoreSet(Collections.emptyList());
+    
     FolderScanner scanner = new FolderScanner(false);
     
     Set<Path> paths = scanner.scan(options.coresPath);
