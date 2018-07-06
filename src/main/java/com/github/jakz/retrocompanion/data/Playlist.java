@@ -16,8 +16,9 @@ import com.pixbits.lib.ui.table.ModifiableDataSource;
 public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
 {
   private Path path;
-  
   private final List<Entry> entries;
+  
+  public boolean dirty;
   
   public Playlist(Path path)
   {
@@ -28,6 +29,11 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
   public String toString()
   {
     return path.getFileName().toString() + " (" + entries.size() + ")";
+  }
+  
+  public void markDirty() 
+  {
+    dirty = true;
   }
   
   public void add(Entry entry)

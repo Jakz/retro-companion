@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.github.jakz.retrocompanion.data.Core;
@@ -18,6 +19,7 @@ import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.Toolbar;
+import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.UIUtils;
@@ -168,50 +170,38 @@ public class Tasks
     else
       UIUtils.showErrorDialog(mediator.modalTarget(), "Error", "Retroarch path doesn't exist");
   }
-  
-  public static void removeAllTagsFromEntryNames(Mediator mediator)
-  {
-    Playlist playlist = mediator.playlist();
 
-    if (playlist != null)
+  public static boolean executeEntryTask(Mediator mediator, EntryTask task, Entry entry) throws TaskException
+  {
+    if (task.process(mediator, entry))
     {
-      for (Entry entry : playlist)
-      {
-        String name = entry.name();
-        int firstTagIndex = name.indexOf('(');
-        
-        if (firstTagIndex != -1 && firstTagIndex > 0)
-        {
-          String newName = name.substring(0, firstTagIndex-1);
-          
-          entry.rename(newName, mediator.options());
-        }
-      }
+      if (mediator.entry() == entry)
+        mediator.selectEntry(entry);
       
-      Entry selectedEntry = mediator.entry();
-      mediator.refreshPlaylist();
-      mediator.selectEntry(selectedEntry);
+      entry.playlist().markDirty();
+      
+      return true;
     }
+    
+    return false;
   }
   
-  public static void renameEntriesToMatchFilename(Mediator mediator)
-  {
-    Playlist playlist = mediator.playlist();
-
-    if (playlist != null)
+  public static boolean executeEntryTaskOnPlaylist(Mediator mediator, EntryTask task, Playlist playlist) throws TaskException
+  {    
+    boolean successOnAny = playlist.stream()
+        .map(StreamException.rethrowFunction(entry -> executeEntryTask(mediator, task, entry)))
+        .reduce(false, Boolean::logicalOr);
+    
+    if (successOnAny)
     {
-      for (Entry entry : playlist)
+      if (mediator.playlist() == playlist)
       {
-        String name = entry.name();
-        String newName = FileUtils.fileNameWithoutExtension(entry.path);
-        
-        if (!name.equals(newName))      
-          entry.rename(newName, mediator.options());
+        Entry selectedEntry = mediator.entry();
+        mediator.refreshPlaylist();
+        mediator.selectEntry(selectedEntry);
       }
-      
-      Entry selectedEntry = mediator.entry();
-      mediator.refreshPlaylist();
-      mediator.selectEntry(selectedEntry);
     }
+    
+    return successOnAny;
   }
 }

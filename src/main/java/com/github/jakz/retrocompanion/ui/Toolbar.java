@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileFilter;
 
+import com.github.jakz.retrocompanion.EntryTask;
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.Tasks;
 import com.github.jakz.retrocompanion.data.Entry;
@@ -143,12 +144,12 @@ public class Toolbar extends JToolBar
     
     JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));
     removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
-    removeTags.addActionListener(e -> Tasks.removeAllTagsFromEntryNames(mediator));
+    removeTags.addActionListener(e -> Tasks.executeEntryTaskOnPlaylist(mediator, EntryTask.RemoveTagsFromName, mediator.playlist()));
     add(removeTags);
     
     JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(24));
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
-    renameToFilename.addActionListener(e -> Tasks.renameEntriesToMatchFilename(mediator));
+    renameToFilename.addActionListener(e -> Tasks.executeEntryTaskOnPlaylist(mediator, EntryTask.RenameEntryToMatchFileName, mediator.playlist()));
     add(renameToFilename);
 
     JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
