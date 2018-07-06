@@ -118,27 +118,6 @@ public class Tasks
       mediator.selectEntry(entry);
     }
   }
-    
-  public static void sortPlaylistAlphabetically(Mediator mediator)
-  {
-    Playlist playlist = mediator.playlist();
-    
-    if (playlist != null)
-    {
-      //TODO: localize
-      boolean confirmed = !mediator.options().showConfirmationDialogForUndoableOperations || UIUtils.showConfirmDialog(
-          mediator.modalTarget(),
-          "Warning",
-          "Sorting the playlist can't be undone, are you sure you want to proceed?"
-      );
-      
-      if (confirmed)
-      {                 
-        Standalone.sortPlaylistAlphabetically(playlist);      
-        mediator.refreshPlaylist();
-      }
-    }
-  }
   
   public static void relativizePathsToRetroarch(Mediator mediator)
   {
@@ -172,6 +151,17 @@ public class Tasks
       UIUtils.showErrorDialog(mediator.modalTarget(), "Error", "Retroarch path doesn't exist");
   }
   
+  public static boolean askForConfirmation(Mediator mediator, String message)
+  {
+    boolean confirmed = !mediator.options().showConfirmationDialogForUndoableOperations || UIUtils.showConfirmDialog(
+        mediator.modalTarget(),
+        "Warning",
+        message
+    );
+    
+    return confirmed;
+  }
+  
   public static boolean executeEntryTask(Mediator mediator, EntryTask task, Entry entry) throws TaskException
   {
     if (task.process(mediator, entry))
@@ -189,7 +179,7 @@ public class Tasks
   
   public static boolean executePlaylistTask(Mediator mediator, PlaylistTask task, Playlist playlist) throws TaskException
   {
-    if (task.process(mediator, playlist))
+    if (playlist != null && task.process(mediator, playlist))
     {
       if (mediator.playlist() == playlist)
       {

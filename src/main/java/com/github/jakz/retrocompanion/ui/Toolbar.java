@@ -141,7 +141,7 @@ public class Toolbar extends JToolBar
     
     JButton sortButton = new JButton(Icon.SORT_AZ.icon(24));
     sortButton.setToolTipText(Strings.HELP_SORT_PLAYLIST_TOOLTIP.text());
-    sortButton.addActionListener(e -> Tasks.sortPlaylistAlphabetically(mediator));
+    sortButton.addActionListener(e -> executePlaylistTask(mediator, PlaylistTask.SortPlaylistAlphabetically, mediator.playlist()));
     add(sortButton);
     
     JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));

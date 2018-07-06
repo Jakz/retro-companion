@@ -73,11 +73,6 @@ public class PlaylistTablePanel extends JPanel
     table = new JTable();
     model = new Model(table);
     
-    table.setDragEnabled(true);
-    table.setDropMode(DropMode.INSERT_ROWS);
-    table.setTransferHandler(new TableRowTransferHandler<Entry>(model));
-    table.setFillsViewportHeight(true);
-
     JScrollPane tablePane = new JScrollPane(table);
     tablePane.setPreferredSize(new Dimension(800, 400));
     
@@ -183,7 +178,11 @@ public class PlaylistTablePanel extends JPanel
         mediator.onEntrySelected(i != -1 ? model.data().get(i) : null);      
       }));
       
-      table.setTransferHandler(new FileTransferHandler(new DragDropListener()));
+      table.setDragEnabled(true);
+      table.setDropMode(DropMode.INSERT_ROWS);
+      table.setTransferHandler(new PlaylistTableTransferHandler(mediator, table, model));
+      table.setFillsViewportHeight(true);
+      
     }
     catch (Exception e)
     {
@@ -242,69 +241,6 @@ public class PlaylistTablePanel extends JPanel
     Model(JTable table)
     {
       super(table, DataSource.empty());
-    }
-  }
-  
-  private class DragDropListener implements FileTransferHandler.Listener
-  {
-    @Override
-    public void filesDropped(TransferHandler.TransferSupport info, Path[] files)
-    {
-      JTable target = (JTable) info.getComponent();
-      JTable.DropLocation dl = (JTable.DropLocation) info.getDropLocation();
-      
-      int index = dl.getRow();
-      int max = table.getModel().getRowCount();
-
-      if (index < 0 || index > max)
-        index = max;
-      
-      target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
-      
-      try
-      {
-        recursiveAdd(index, files);
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace();
-      }
-      
-      mediator.refreshPlaylist();
-    }
-    
-    public void recursiveAdd(int index, Path[] start) throws IOException
-    {
-      Deque<Path> deque = new ArrayDeque<>();  
-      FolderScanner scanner = new FolderScanner(FolderScanner.FolderMode.ADD_TO_RESULT);
-      
-      for (Path path : start)
-        deque.addLast(path);
-      
-      while (!deque.isEmpty())
-      {
-        Path path = deque.removeLast();
-        
-        if (Files.isDirectory(path))
-        {
-          Set<Path> children = scanner.scan(path);
-          children.stream()
-            .filter(StreamException.rethrowPredicate(p -> !Files.isHidden(p)))
-            .forEach(deque::addLast);
-        }
-        else
-          addEntry(index, path);
-      }
-    }
-    
-    public void addEntry(int index, Path path)
-    {
-      Entry entry = new Entry(playlist, path, FileUtils.fileNameWithoutExtension(path), Optional.empty(), Optional.empty());
-      
-      if (mediator.options().autoRelativizePathsWhenImporting)
-        entry.relativizePath(mediator.options().retroarchPath);
-      
-      playlist.add(index, entry);
     }
   }
 }
