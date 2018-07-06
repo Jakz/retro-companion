@@ -170,7 +170,7 @@ public class Tasks
     else
       UIUtils.showErrorDialog(mediator.modalTarget(), "Error", "Retroarch path doesn't exist");
   }
-
+  
   public static boolean executeEntryTask(Mediator mediator, EntryTask task, Entry entry) throws TaskException
   {
     if (task.process(mediator, entry))
