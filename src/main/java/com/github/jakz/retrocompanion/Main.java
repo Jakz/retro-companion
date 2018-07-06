@@ -17,6 +17,7 @@ import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.github.jakz.retrocompanion.parsers.CoreParser;
 import com.github.jakz.retrocompanion.parsers.PlaylistParser;
+import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
 import com.github.jakz.retrocompanion.ui.MainPanel;

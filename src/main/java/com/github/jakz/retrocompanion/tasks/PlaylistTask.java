@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion;
+package com.github.jakz.retrocompanion.tasks;
 
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.ui.Mediator;

@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion;
+package com.github.jakz.retrocompanion.tasks;
 
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.ui.Mediator;

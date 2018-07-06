@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion;
+package com.github.jakz.retrocompanion.tasks;
 
 import java.io.IOException;
 import java.nio.file.FileSystems;
@@ -12,6 +12,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
@@ -186,13 +187,9 @@ public class Tasks
     return false;
   }
   
-  public static boolean executeEntryTaskOnPlaylist(Mediator mediator, EntryTask task, Playlist playlist) throws TaskException
-  {    
-    boolean successOnAny = playlist.stream()
-        .map(StreamException.rethrowFunction(entry -> executeEntryTask(mediator, task, entry)))
-        .reduce(false, Boolean::logicalOr);
-    
-    if (successOnAny)
+  public static boolean executePlaylistTask(Mediator mediator, PlaylistTask task, Playlist playlist) throws TaskException
+  {
+    if (task.process(mediator, playlist))
     {
       if (mediator.playlist() == playlist)
       {
@@ -200,8 +197,10 @@ public class Tasks
         mediator.refreshPlaylist();
         mediator.selectEntry(selectedEntry);
       }
+      
+      return true;
     }
     
-    return successOnAny;
+    return false;
   }
 }

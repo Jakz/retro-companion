@@ -14,11 +14,13 @@ import javax.swing.JOptionPane;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileFilter;
 
-import com.github.jakz.retrocompanion.EntryTask;
 import com.github.jakz.retrocompanion.Options;
-import com.github.jakz.retrocompanion.Tasks;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.tasks.EntryTask;
+import com.github.jakz.retrocompanion.tasks.PlaylistTask;
+import com.github.jakz.retrocompanion.tasks.TaskException;
+import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.ui.UIUtils;
 
@@ -144,12 +146,12 @@ public class Toolbar extends JToolBar
     
     JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));
     removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
-    removeTags.addActionListener(e -> Tasks.executeEntryTaskOnPlaylist(mediator, EntryTask.RemoveTagsFromName, mediator.playlist()));
+    removeTags.addActionListener(e -> executeEntryTaskOnPlaylist(mediator, EntryTask.RemoveTagsFromName, mediator.playlist()));
     add(removeTags);
     
     JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(24));
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
-    renameToFilename.addActionListener(e -> Tasks.executeEntryTaskOnPlaylist(mediator, EntryTask.RenameEntryToMatchFileName, mediator.playlist()));
+    renameToFilename.addActionListener(e -> executeEntryTaskOnPlaylist(mediator, EntryTask.RenameEntryToMatchFileName, mediator.playlist()));
     add(renameToFilename);
 
     JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
@@ -163,5 +165,22 @@ public class Toolbar extends JToolBar
     add(makeAbsolute);
   
     setFloatable(false);
+  }
+  
+  public void executeEntryTaskOnPlaylist(Mediator mediator, EntryTask task, Playlist playlist)
+  {
+    executePlaylistTask(mediator, PlaylistTask.of(task), playlist);
+  }
+  
+  private void executePlaylistTask(Mediator mediator, PlaylistTask task, Playlist playlist)
+  {
+    try
+    {
+      Tasks.executePlaylistTask(mediator, task, playlist);
+    }
+    catch (TaskException e)
+    {
+      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+    }
   }
 }
