@@ -12,10 +12,10 @@ public class Entry
   public Path path;
   private String name;
   private Optional<Core.Ref> core;
-  Optional<DatabaseReference> databaseEntry;
+  Optional<DBRef> dbref;
   Playlist playlist;
   
-  public Entry(Playlist playlist, Path path, String name, Optional<Core.Ref> core)
+  public Entry(Playlist playlist, Path path, String name, Optional<Core.Ref> core, Optional<DBRef> dbref)
   {
     this.playlist = playlist;
     
@@ -23,7 +23,7 @@ public class Entry
     this.name = name;
     
     this.core = core;
-    this.databaseEntry  = Optional.empty();
+    this.dbref  = dbref;
   }
     
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
@@ -32,6 +32,18 @@ public class Entry
   public void setCore(Optional<Core.Ref> core) { this.core = core; }
   public Optional<Core.Ref> core() { return core; } 
   public String name() { return name; }
+  
+  public void relativizePath(Path path)
+  {
+    if (this.path.isAbsolute())
+      this.path = path.relativize(this.path).normalize();
+  }
+  
+  public void makeAbsolutePath(Path path)
+  {
+    if (!this.path.isAbsolute())
+      this.path = path.resolve(this.path).toAbsolutePath().normalize();
+  }
 
   public boolean rename(String name, Options options)
   {
@@ -78,8 +90,8 @@ public class Entry
           .orElse("DETECT")
       ).append(nl)
       
-      .append(databaseEntry
-          .map(DatabaseReference::toString)
+      .append(dbref
+          .map(DBRef::toString)
           .orElse("DETECT")
       ).append(nl)
       

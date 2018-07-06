@@ -1,5 +1,6 @@
 package com.github.jakz.retrocompanion;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,17 +31,24 @@ public class Tasks
     
     public static void makePathsRelative(Playlist playlist, Path path)
     {
-      playlist.stream().filter(e -> e.path.isAbsolute()).forEach(entry -> entry.path = path.relativize(entry.path).normalize());
+      playlist.stream().forEach(entry -> entry.relativizePath(path));
     }
     
     public static void makePathsAbsolute(Playlist playlist, Path path)
     {
-      playlist.stream().forEach(entry -> entry.path = path.resolve(entry.path).toAbsolutePath().normalize());
+      playlist.stream().forEach(entry -> entry.makeAbsolutePath(path));
     }
     
     public static void save(Playlist playlist)
     {
-      playlist.save(playlist.path());
+      try
+      {
+        playlist.save(playlist.path());
+      }
+      catch (IOException e)
+      {
+        e.printStackTrace();
+      }
     }
   }
   
@@ -76,9 +84,9 @@ public class Tasks
       int index = entries.stream()
         .map(playlist::indexOf)
         .max(Integer::compare)
-        .orElse(playlist.size()-1);
+        .orElse(playlist.size());
       
-      Entry entry = new Entry(playlist, Paths.get("locate.me"), "Name", Optional.empty());
+      Entry entry = new Entry(playlist, Paths.get("locate.me"), "Name", Optional.empty(), Optional.empty());
       playlist.add(index, entry);
       mediator.refreshPlaylist();
       mediator.selectEntry(entry);

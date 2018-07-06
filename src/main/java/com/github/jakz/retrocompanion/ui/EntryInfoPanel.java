@@ -18,6 +18,7 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
+import javax.swing.TransferHandler;
 
 import org.imgscalr.Scalr;
 
@@ -169,7 +170,7 @@ public class EntryInfoPanel extends JPanel
     }
     
     @Override
-    public void filesDropped(Path[] files)
+    public void filesDropped(TransferHandler.TransferSupport info, Path[] files)
     {
       try
       {

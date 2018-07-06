@@ -3,6 +3,7 @@ package com.github.jakz.retrocompanion.ui;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Cursor;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,15 +27,19 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.DBRef;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.ui.FileTransferHandler;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
 import com.pixbits.lib.ui.table.SimpleListSelectionListener;
@@ -156,6 +161,8 @@ public class PlaylistTablePanel extends JPanel
       table.getSelectionModel().addListSelectionListener(SimpleListSelectionListener.ofJustSingle(i -> {
         mediator.onEntrySelected(i != -1 ? model.data().get(i) : null);      
       }));
+      
+      table.setTransferHandler(new FileTransferHandler(new DragDropListener()));
     }
     catch (Exception e)
     {
@@ -207,14 +214,42 @@ public class PlaylistTablePanel extends JPanel
   {
     model.fireTableDataChanged();
   }
-  
-  
+
   private class Model extends TableModel<Entry>
   {
     
     Model(JTable table)
     {
       super(table, DataSource.empty());
+    }
+  }
+  
+  private class DragDropListener implements FileTransferHandler.Listener
+  {
+    @Override
+    public void filesDropped(TransferHandler.TransferSupport info, Path[] files)
+    {
+      JTable target = (JTable) info.getComponent();
+      JTable.DropLocation dl = (JTable.DropLocation) info.getDropLocation();
+      
+      int index = dl.getRow();
+      int max = table.getModel().getRowCount();
+
+      if (index < 0 || index > max)
+        index = max;
+      
+      target.setCursor(Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR));
+      
+      for (int i = files.length - 1; i >= 0; --i)
+      {
+        Entry entry = new Entry(playlist, files[i], FileUtils.fileNameWithoutExtension(files[i]), Optional.empty(), Optional.empty());
+        
+        if (mediator.options().autoRelativizePathsWhenImporting)
+          entry.relativizePath(mediator.options().retroarchPath);
+        
+        playlist.add(index, entry);
+        mediator.refreshPlaylist();
+      }
     }
   }
   

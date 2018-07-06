@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
+import com.github.jakz.retrocompanion.data.DBRef;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.ParseException;
 import com.github.jakz.retrocompanion.data.PendingEntry;
@@ -31,7 +32,17 @@ public class PlaylistParser
     entry.name = lines.get(1);
     entry.corePath = lines.get(2).equals("DETECT") ? Optional.empty() : Optional.of(Paths.get(lines.get(2)));
     entry.coreName = lines.get(3).equals("DETECT") ? Optional.empty() : Optional.of(lines.get(3));
-    entry.databaseEntry = Optional.empty();
+    
+    if (lines.get(4).equals("DETECT"))
+      entry.dbref = Optional.empty();
+    else
+    {
+      String[] tokens = lines.get(4).split("\\|");
+      
+      if (tokens[1].equals("crc"))
+        entry.dbref = Optional.of(new DBRef.CRC(Long.parseLong(tokens[0], 16)));
+    }   
+    
     entry.playlistName = Paths.get(lines.get(5));
     
     return entry;
@@ -59,12 +70,13 @@ public class PlaylistParser
     }));
     
 
+    
     /* parse database reference */
     
     if (!options.autoFixPlaylistNamesInEntries && !entry.playlistName.toString().equals(playlist.nameWithExtension()))
       throw new ParseException("Name of playlist in entry doesn't match name of playlist itself ('%s' != '%s')", entry.playlistName.toString(), playlist.nameWithExtension());
 
-    return new Entry(playlist, entry.path, entry.name, coreRef);
+    return new Entry(playlist, entry.path, entry.name, coreRef, entry.dbref);
   }
   
   public Playlist parse(Path filepath)

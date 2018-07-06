@@ -33,6 +33,7 @@ public class Options
   public boolean overwriteThumbnailWithoutConfirmation;
   public boolean thumbnailMoveInsteadThanCopy;
   public boolean showConfirmationDialogForUndoableOperations;
+  public boolean autoRelativizePathsWhenImporting;
   
   /* TODO: we're passing it here but maybe there's a better place */
   public transient CoreSet cores;
@@ -46,6 +47,7 @@ public class Options
     overwriteThumbnailWithoutConfirmation = true;
     thumbnailMoveInsteadThanCopy = false;
     showConfirmationDialogForUndoableOperations = true;
+    autoRelativizePathsWhenImporting = true;
   }
   
   public void derivePathsFromRetroarch()

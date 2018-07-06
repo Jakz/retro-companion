@@ -9,6 +9,6 @@ public class PendingEntry
   public String name;
   public Optional<Path> corePath;
   public Optional<String> coreName;
-  public Optional<DatabaseReference> databaseEntry;
+  public Optional<DBRef> dbref;
   public Path playlistName;
 }

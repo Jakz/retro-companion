@@ -21,6 +21,13 @@ public class Toolbar extends JToolBar
   {
     this.mediator = mediator;
 
+    JButton save = new JButton(Icon.SAVE.icon(24));
+    save.setToolTipText("Save playlist"); //TODO: localize
+    save.addActionListener(e -> Tasks.Standalone.save(mediator.playlist()));
+    add(save);
+    
+    addSeparator();
+    
     JButton addEntry = new JButton(Icon.ADD_ENTRY.icon(24));
     addEntry.setToolTipText(Strings.HELP_ADD_NEW_ENTRY.text());
     addEntry.addActionListener(e -> Tasks.addEntryToPlaylist(mediator));
