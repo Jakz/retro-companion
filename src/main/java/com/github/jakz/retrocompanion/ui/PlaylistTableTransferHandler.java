@@ -133,7 +133,8 @@ public class PlaylistTableTransferHandler extends TransferHandler
         Path[] paths = files.stream().map( f -> f.toPath() ).toArray(Path[]::new);
         int count = recursiveAdd(index, paths);
         
-        table.getSelectionModel().setSelectionInterval(index, index+count-1);
+        if (count > 0)
+          table.getSelectionModel().setSelectionInterval(index, index+count-1);
       }
       
       return true;
@@ -159,6 +160,10 @@ public class PlaylistTableTransferHandler extends TransferHandler
     Deque<Path> deque = new ArrayDeque<>();  
     FolderScanner scanner = new FolderScanner(FolderScanner.FolderMode.ADD_TO_RESULT);
     
+    Set<Path> used = mediator.options().skipImportingDuplicates ?
+      mediator.playlist().stream().map(e -> e.absolutePath(mediator)).collect(Collectors.toSet()) :
+      Collections.emptySet();
+    
     int count = 0;
     
     for (Path path : start)
@@ -178,8 +183,14 @@ public class PlaylistTableTransferHandler extends TransferHandler
       }
       else
       {
-        addEntry(index, path);
-        ++count;
+        if (!used.contains(path))
+        {
+          addEntry(index, path);
+          ++count;
+          
+          if (mediator.options().skipImportingDuplicates)
+            used.add(path);
+        }
       }
     }
     

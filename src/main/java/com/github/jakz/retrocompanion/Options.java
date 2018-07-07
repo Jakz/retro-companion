@@ -36,6 +36,7 @@ public class Options
   public boolean thumbnailMoveInsteadThanCopy;
   public boolean showConfirmationDialogForUndoableOperations;
   public boolean autoRelativizePathsWhenImporting;
+  public boolean skipImportingDuplicates;
   
   /* TODO: we're passing it here but maybe there's a better place */
   public transient CoreSet cores;
@@ -50,6 +51,7 @@ public class Options
     thumbnailMoveInsteadThanCopy = false;
     showConfirmationDialogForUndoableOperations = true;
     autoRelativizePathsWhenImporting = true;
+    skipImportingDuplicates = true;
   }
   
   public void derivePathsFromRetroarch()

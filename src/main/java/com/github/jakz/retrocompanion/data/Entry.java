@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 
 import com.github.jakz.retrocompanion.Options;
+import com.github.jakz.retrocompanion.ui.Mediator;
 
 public class Entry
 {
@@ -24,6 +25,14 @@ public class Entry
     
     this.core = core;
     this.dbref  = dbref;
+  }
+  
+  public Path absolutePath(Mediator mediator)
+  { 
+    if (path.isAbsolute())
+      return path;
+    else //TOOD: always safe?
+      return mediator.options().retroarchPath.resolve(path).normalize().toAbsolutePath();
   }
     
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
