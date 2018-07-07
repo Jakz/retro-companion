@@ -1,12 +1,18 @@
 package com.github.jakz.retrocompanion.data;
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.Optional;
+import java.util.Set;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.ui.Mediator;
+import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.io.FolderScanner;
 
 public class Entry
 {
@@ -56,26 +62,43 @@ public class Entry
 
   public boolean rename(String name, Options options)
   {
-    for (ThumbnailType tt : ThumbnailType.values())
+    try 
     {
-      Path oldPath = options.pathForThumbnail(playlist, tt, this);
-      Path newPath = oldPath.getParent().resolve(name+".png");
-      
-      if (Files.exists(oldPath))
+      /* rename thumbnails */
+      for (ThumbnailType tt : ThumbnailType.values())
       {
-        try 
-        {
+        Path oldPath = options.pathForThumbnail(playlist, tt, this);
+        Path newPath = oldPath.getParent().resolve(name+".png");
+        
+        if (Files.exists(oldPath))
           Files.move(oldPath, newPath);
-        } 
-        catch (IOException e)
-        {
-          e.printStackTrace();
-          return false;
-        }
       }
-    }
-    
-    this.name = name;
+      
+      this.name = name;
+      
+      /* TODO: this should be done on filename change, not on entry name change
+      
+      // rename save states and memory cards 
+      //TODO: this should be verified against strange cores like ePSXe which may use strange namings
+      FolderScanner scanner = new FolderScanner(FileSystems.getDefault().getPathMatcher("glob:"+FileUtils.fileNameWithoutExtension(path.getFileName())+".*"), true);
+      
+      Set<Path> states = scanner.scan(Arrays.asList(new Path[] { options.savesPath, options.statesPath }));
+      for (Path path : states)
+      {
+        String extension = FileUtils.pathExtension(path);
+        
+        Path finalPath = path.getParent().resolve(name + "." + extension);
+        Files.move(path, finalPath);
+      };     
+      
+      */
+    } 
+    catch (IOException e)
+    {
+      e.printStackTrace();
+      return false;
+    }  
+
     return true;
   }
   

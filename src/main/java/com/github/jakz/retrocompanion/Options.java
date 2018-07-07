@@ -30,6 +30,8 @@ public class Options
   public Path thumbnailsPath;
   public Path coresPath;
   public Path infoPath;
+  public Path savesPath;
+  public Path statesPath;
   
   public boolean autoFixPlaylistNamesInEntries;
   public boolean overwriteThumbnailWithoutConfirmation;
@@ -66,11 +68,15 @@ public class Options
       String home = System.getProperty("user.home");
       playlistsPath = Paths.get(home, "Library/Application Support/RetroArch/playlists");
       thumbnailsPath = Paths.get(home, "Library/Application Support/RetroArch/thumbnails");
+      savesPath = Paths.get(home, "Library/Application Support/RetroArch/saves");
+      statesPath = Paths.get(home, "Library/Application Support/RetroArch/states");
     }
     else
     {
       playlistsPath = retroarchPath.resolve("playlists");
       thumbnailsPath = retroarchPath.resolve("thumbnails");
+      savesPath = retroarchPath.resolve("saves");
+      statesPath = retroarchPath.resolve("states");
     }
   }
   
@@ -85,7 +91,7 @@ public class Options
   void save(Path path) throws IOException
   {
     Gson gson = new GsonBuilder()
-      .registerTypeAdapter(Path.class, new PathAdapter())
+      .registerTypeHierarchyAdapter(Path.class, new PathAdapter())
       .setPrettyPrinting()
       .create();
         
@@ -98,7 +104,7 @@ public class Options
   public void load(Path path) throws IOException
   {
     Gson gson = new GsonBuilder()
-        .registerTypeAdapter(Path.class, new PathAdapter())
+        .registerTypeHierarchyAdapter(Path.class, new PathAdapter())
         .registerTypeAdapter(Options.class, new InstanceCreator<Options>()
         {
           @Override public Options createInstance(Type type) {

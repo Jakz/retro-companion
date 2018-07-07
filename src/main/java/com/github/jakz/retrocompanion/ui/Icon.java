@@ -22,8 +22,9 @@ public enum Icon
   
   SAVE("save"),
   NEW_PLAYLIST("new"),
-  DELETE_PLAYLIST("delete")
+  DELETE_PLAYLIST("delete"),
   
+  OPTIONS("options")
   ;
   
   private final String name;

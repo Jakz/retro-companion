@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JMenu;
@@ -161,6 +162,13 @@ public class Toolbar extends JToolBar
     });
     
     add(setCore);
+    
+    add(Box.createHorizontalGlue());
+    
+    JButton options = new JButton(Icon.OPTIONS.icon(24));
+    options.setToolTipText("Options"); //TODO: localize
+    options.addActionListener(e -> mediator.showOptions());
+    add(options);
   
     setFloatable(false);
   }

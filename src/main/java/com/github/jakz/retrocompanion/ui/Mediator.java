@@ -28,4 +28,5 @@ public interface Mediator
   public Options options();
   
   public Container modalTarget();
+  public void showOptions();
 }

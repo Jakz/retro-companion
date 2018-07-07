@@ -10,6 +10,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JFrame;
+
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
@@ -22,10 +24,11 @@ import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
 import com.github.jakz.retrocompanion.ui.MainPanel;
 import com.github.jakz.retrocompanion.ui.Mediator;
-import com.github.jakz.retrocompanion.ui.PathsPanel;
+import com.github.jakz.retrocompanion.ui.OptionsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.WrapperFrame;
+import com.pixbits.lib.util.ShutdownManager;
 
 public class Main 
 {  
@@ -65,10 +68,15 @@ public class Main
     }
   }
   
+  private static ShutdownManager manager;
+  
   private static final List<Playlist> playlists = new ArrayList<>();
+
+  private static WrapperFrame<MainPanel> mainFrame;
+  private static WrapperFrame<OptionsPanel> optionsFrame;
   
   private static MainPanel mainPanel;
-  
+
   private static EntryInfoPanel entryInfoPanel;
   private static PlaylistTablePanel playlistPanel;
   
@@ -192,37 +200,57 @@ public class Main
     {
       return mainPanel;
     }
+    
+    @Override
+    public void showOptions()
+    {
+      optionsFrame.setLocationRelativeTo(mainFrame);
+      
+      if (!optionsFrame.isVisible())
+      {
+        optionsFrame.panel().refresh();
+        optionsFrame.setVisible(true);
+      }
+      else
+        optionsFrame.toFront();
+    }
   }
   
   public static void main(String[] args)
   {
     try
     {
-      MyMediator mediator = new MyMediator();
+      loadOptions();
+      manager = new ShutdownManager(true);
+      manager.addTask(() -> saveOptions());
       
+      MyMediator mediator = new MyMediator();
+
       UIUtils.setNimbusLNF();
       
       CoreSet cores = new CoreParser().parse(options);
       options.cores = cores;
-      CoreTablePanel coresPanel = new CoreTablePanel(mediator);
+     
+      /*CoreTablePanel coresPanel = new CoreTablePanel(mediator);
       coresPanel.setCores(cores);
       
       WrapperFrame<?> coresFrame = UIUtils.buildFrame(coresPanel, "Cores");
 
       coresFrame.exitOnClose();
       coresFrame.centerOnScreen();
-      coresFrame.setVisible(true);
+      coresFrame.setVisible(true);*/
       
       //PlaylistParser parser = new PlaylistParser(options);
       //Playlist playlist = parser.parse(Paths.get("F:\\Misc\\Frontends\\Retroarch\\playlists\\NES.lpl"));
       //Playlist playlist = parser.parse(Paths.get("/Volumes/Vicky/Misc/Frontends/Retroarch/playlists/NES.lpl"));
       
+      optionsFrame = UIUtils.buildFrame(new OptionsPanel(mediator), "Options"); 
+
       mainPanel = new MainPanel(mediator);
       Main.playlistPanel = mainPanel.playlistPanel;
       Main.entryInfoPanel = mainPanel.entryInfoPanel;
-
-      WrapperFrame<?> mainFrame = UIUtils.buildFrame(mainPanel, "RetroCompanion v0.1");
-
+      
+      mainFrame = UIUtils.buildFrame(mainPanel, "RetroCompanion v0.1");
       mainFrame.exitOnClose();
       mainFrame.centerOnScreen();
       mainFrame.setVisible(true);
