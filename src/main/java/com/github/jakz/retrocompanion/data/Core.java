@@ -19,7 +19,8 @@ public class Core
     this.coreName = coreName;
     this.systemName = systemName;
   }
-  
+ 
+  public String systemName() { return systemName; }
   public String shortLibraryName() { return FileUtils.fileNameWithoutExtension(path); }
 
   public static class Ref
@@ -31,6 +32,11 @@ public class Core
     {
       this.core = core;
       this.name = name;
+    }
+    
+    public Ref(Core core)
+    {
+      this(core, Optional.empty());
     }
         
     public Path path() { return core.path; }

@@ -111,7 +111,14 @@ public class Main
     public void removePlaylist(Playlist playlist)
     {
       playlists.remove(playlist);
+      
+      boolean wasSelected = mainPanel.playlistChooser.getSelectedItem() == playlist;
+      int index = mainPanel.playlistChooser.getSelectedIndex();
+
       mainPanel.playlistChooser.removeItem(playlist);
+      
+      if (wasSelected && mainPanel.playlistChooser.getItemCount() > 0)
+        mainPanel.playlistChooser.setSelectedIndex(index);
     }
     
     

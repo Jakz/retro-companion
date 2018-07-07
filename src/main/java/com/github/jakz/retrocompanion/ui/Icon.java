@@ -18,6 +18,7 @@ public enum Icon
   MAKE_ABSOLUTE("make_absolute"),
   REMOVE_TAGS("remove_tags"),
   RENAME_TO_FILENAME("rename_to_filename"),
+  SET_CORE("set_core"),
   
   SAVE("save"),
   NEW_PLAYLIST("new"),

@@ -1,5 +1,8 @@
 package com.github.jakz.retrocompanion.tasks;
 
+import java.util.Optional;
+
+import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.pixbits.lib.io.FileUtils;
@@ -39,8 +42,17 @@ public interface EntryTask
     return false;
   };
   
+  public static EntryTask AssignCore(Optional<Core.Ref> core) 
+  {
+    return (mediator, entry) -> {
+      entry.setCore(core.map(Core.Ref::dupe));
+      return true;
+    };
+  }
+  
   public static final EntryTask MakeEntryPathAbsolute = (mediator, entry) ->
   {
+    //TODO: finish
     return true;
   };
 }

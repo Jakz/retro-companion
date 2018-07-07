@@ -49,18 +49,6 @@ public class Tasks
       playlist.stream().forEach(entry -> entry.makeAbsolutePath(path));
     }
     
-    public static void save(Playlist playlist)
-    {
-      try
-      {
-        playlist.save(playlist.path());
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace();
-      }
-    }
-    
     public static List<Playlist> loadPlaylistsFromFolder(Path folder, Options options)
     {
       try

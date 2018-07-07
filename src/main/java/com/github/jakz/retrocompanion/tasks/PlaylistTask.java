@@ -1,5 +1,8 @@
 package com.github.jakz.retrocompanion.tasks;
 
+import java.io.IOException;
+import java.nio.file.Files;
+
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.tasks.Tasks.Standalone;
 import com.github.jakz.retrocompanion.ui.Mediator;
@@ -33,5 +36,38 @@ public interface PlaylistTask
     }
     
     return true;
+  };
+  
+  public static final PlaylistTask SavePlaylist = (mediator, playlist) ->
+  {
+    try
+    {
+      playlist.save(playlist.path());
+      return true;
+    }
+    catch (IOException e)
+    {
+      throw new TaskException("Excepton while saving", e);
+      //e.printStackTrace();
+    }
+  };
+  
+  public static final PlaylistTask DeletePlaylist = (mediator, playlist) ->
+  {
+    try
+    {
+      if (!Tasks.askForConfirmation(mediator, "Deleting a playlist can't be undone, do you want to proceed?"))
+        return false;
+      
+      if (Files.exists(playlist.path()))
+        Files.delete(playlist.path());
+      
+      mediator.removePlaylist(playlist);
+      return true;
+    }
+    catch (IOException e)
+    {
+      throw new TaskException("Excepton while deleting playlist", e);
+    }
   };
 }

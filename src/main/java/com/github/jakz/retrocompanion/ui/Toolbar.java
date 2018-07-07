@@ -1,20 +1,30 @@
 package com.github.jakz.retrocompanion.ui;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileFilter;
 
 import com.github.jakz.retrocompanion.Options;
+import com.github.jakz.retrocompanion.data.Core;
+import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.tasks.EntryTask;
@@ -27,7 +37,8 @@ import com.pixbits.lib.ui.UIUtils;
 public class Toolbar extends JToolBar 
 {
   private final Mediator mediator;
-  
+  private CoreSelectMenu coreSelectMenu;
+
   public Toolbar(Mediator mediator)
   {
     this.mediator = mediator;
@@ -85,44 +96,17 @@ public class Toolbar extends JToolBar
 
       
     });
+    
     add(newPlaylist);
     
     JButton deletePlaylist = new JButton(Icon.DELETE_PLAYLIST.icon(24));
     deletePlaylist.setToolTipText("Delete current playlist"); //TODO: localize
-    deletePlaylist.addActionListener(e -> {
-      Playlist playlist = mediator.playlist();
-      
-      if (playlist != null)
-      {
-        //TODO: maybe ignore the setting?
-        boolean confirmed = !mediator.options().showConfirmationDialogForUndoableOperations || UIUtils.showConfirmDialog(
-            mediator.modalTarget(),
-            "Warning",
-            "Deleting a playlist can't be undone, do you want to proceed?"
-        );
-        
-        if (confirmed)
-        {
-          try
-          {
-            if (Files.exists(playlist.path()))
-              Files.delete(playlist.path());
-            
-            mediator.removePlaylist(playlist);
-            mediator.selectPlaylist(null);
-          }
-          catch (IOException ex)
-          {
-            ex.printStackTrace();
-          }
-        }
-      }
-    });
+    deletePlaylist.addActionListener(e -> executePlaylistTask(PlaylistTask.DeletePlaylist));
     add(deletePlaylist);
 
     JButton save = new JButton(Icon.SAVE.icon(24));
     save.setToolTipText("Save playlist"); //TODO: localize
-    save.addActionListener(e -> Tasks.Standalone.save(mediator.playlist()));
+    save.addActionListener(e -> executePlaylistTask(PlaylistTask.SavePlaylist));
     add(save);
     
     addSeparator();
@@ -141,17 +125,17 @@ public class Toolbar extends JToolBar
     
     JButton sortButton = new JButton(Icon.SORT_AZ.icon(24));
     sortButton.setToolTipText(Strings.HELP_SORT_PLAYLIST_TOOLTIP.text());
-    sortButton.addActionListener(e -> executePlaylistTask(mediator, PlaylistTask.SortPlaylistAlphabetically, mediator.playlist()));
+    sortButton.addActionListener(e -> executePlaylistTask(PlaylistTask.SortPlaylistAlphabetically));
     add(sortButton);
     
     JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));
     removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
-    removeTags.addActionListener(e -> executeEntryTaskOnPlaylist(mediator, EntryTask.RemoveTagsFromName, mediator.playlist()));
+    removeTags.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.RemoveTagsFromName));
     add(removeTags);
     
     JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(24));
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
-    renameToFilename.addActionListener(e -> executeEntryTaskOnPlaylist(mediator, EntryTask.RenameEntryToMatchFileName, mediator.playlist()));
+    renameToFilename.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.RenameEntryToMatchFileName));
     add(renameToFilename);
 
     JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
@@ -163,24 +147,63 @@ public class Toolbar extends JToolBar
     makeAbsolute.setToolTipText(Strings.HELP_MAKE_ABSOLUTE_PATHS.text());
     makeAbsolute.addActionListener(e -> Tasks.makePathsAbsolute(mediator));
     add(makeAbsolute);
+    
+    JButton setCore = new JButton(Icon.SET_CORE.icon(24));
+    setCore.setToolTipText("Set same core for all entries");
+    
+    setCore.addMouseListener(new MouseAdapter() {
+      @Override public void mousePressed(MouseEvent e) {
+        if (coreSelectMenu == null)
+          coreSelectMenu = new CoreSelectMenu(mediator.options().cores);
+        
+        coreSelectMenu.show(e.getComponent(), e.getX(), e.getY());
+      }
+    });
+    
+    add(setCore);
   
     setFloatable(false);
   }
   
-  public void executeEntryTaskOnPlaylist(Mediator mediator, EntryTask task, Playlist playlist)
+  public void executeEntryTaskOnPlaylist(EntryTask task)
   {
-    executePlaylistTask(mediator, PlaylistTask.of(task), playlist);
+    executePlaylistTask(PlaylistTask.of(task));
   }
   
-  private void executePlaylistTask(Mediator mediator, PlaylistTask task, Playlist playlist)
+  private void executePlaylistTask(PlaylistTask task)
   {
     try
     {
-      Tasks.executePlaylistTask(mediator, task, playlist);
+      Tasks.executePlaylistTask(mediator, task, mediator.playlist());
     }
     catch (TaskException e)
     {
       UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+    }
+  }
+  
+  private class CoreSelectMenu extends JPopupMenu
+  {
+    public CoreSelectMenu(CoreSet set)
+    {
+      Map<String, List<Core>> coreBySystem = set.stream()
+          .collect(Collectors.groupingBy(Core::systemName, () -> new TreeMap<>(), Collectors.toList()));
+      
+      JMenuItem detect = new JMenuItem("Auto-Detect"); //TODO: localize
+      detect.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.AssignCore(Optional.empty())));
+      add(detect);
+      
+      coreBySystem.forEach((k, cores) -> {
+        JMenu menu = new JMenu(k);
+        add(menu);
+
+        for (Core core : cores)
+        {
+          JMenuItem coreItem = new JMenuItem(core.shortLibraryName());
+          coreItem.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.AssignCore(Optional.ofNullable(new Core.Ref(core)))));
+          menu.add(coreItem);
+        }
+      });
     }
   }
 }

@@ -60,5 +60,5 @@ public class CoreTablePanel extends JPanel
     {
       super(table, DataSource.empty());
     }
-  }
+  }  
 }

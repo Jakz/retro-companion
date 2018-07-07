@@ -141,14 +141,6 @@ public class PlaylistTablePanel extends JPanel
       BiConsumer<Entry, Optional<Core.Ref>> setter = (e,v) -> e.setCore(v.map(Core.Ref::dupe));
       ColumnSpec<Entry, Optional<Core.Ref>> coreColumn = new ColumnSpec<Entry, Optional<Core.Ref>>("Core", (Class<Optional<Core.Ref>>)(Class<?>)Optional.class, getter, setter);
       model.addColumn(coreColumn);
-      
-      Stream<Optional<Core.Ref>> cores = Stream.concat(
-          Stream.of(Optional.empty()), 
-          options.cores.stream()
-            .map(c -> Optional.of(new Core.Ref(c, Optional.empty())))
-            .sorted((c1, c2) -> c1.get().shortLibraryName().compareTo(c2.get().shortLibraryName()))
-      );
-
 
       DefaultTableAndListRenderer<Optional<Core.Ref>> renderer = new DefaultTableAndListRenderer<>()
       {
@@ -160,7 +152,8 @@ public class PlaylistTablePanel extends JPanel
         }
       };
       
-      JComboBox<Optional<Core.Ref>> comboBox = new JComboBox<>(cores.toArray(i -> new Optional<?>[i]));
+      List<Optional<Core.Ref>> cores = options.cores.buildRefList();
+      JComboBox<Optional<Core.Ref>> comboBox = new JComboBox<>(cores.toArray(new Optional[cores.size()]));
       comboBox.setRenderer(renderer);
       
       coreColumn.setEditable(true);
