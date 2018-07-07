@@ -1,4 +1,4 @@
-package com.github.jakz.retrocompanion.data;
+package com.github.jakz.retrocompanion.parsers;
 
 public class ParseException extends IllegalArgumentException
 {

@@ -14,7 +14,6 @@ import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.DBRef;
 import com.github.jakz.retrocompanion.data.Entry;
-import com.github.jakz.retrocompanion.data.ParseException;
 import com.github.jakz.retrocompanion.data.PendingEntry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.pixbits.lib.functional.StreamException;
