@@ -87,26 +87,7 @@ public class Tasks
     }
     
   }
-  
-  public static void addEntryToPlaylist(Mediator mediator)
-  {
-    Playlist playlist = mediator.playlist();
-    List<Entry> entries = mediator.getSelectedEntries();
-    
-    if (playlist != null)
-    {
-      int index = entries.stream()
-        .map(playlist::indexOf)
-        .max(Integer::compare)
-        .orElse(playlist.size());
-      
-      Entry entry = new Entry(playlist, Paths.get("locate.me"), "Name", Optional.empty(), Optional.empty());
-      playlist.add(index, entry);
-      mediator.refreshPlaylist();
-      mediator.selectEntry(entry);
-    }
-  }
-  
+
   public static void relativizePathsToRetroarch(Mediator mediator)
   {
     Playlist playlist = mediator.playlist();

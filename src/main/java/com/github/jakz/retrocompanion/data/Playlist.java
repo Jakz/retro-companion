@@ -28,7 +28,7 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
   
   public String toString()
   {
-    return path.getFileName().toString() + " (" + entries.size() + ")";
+    return path.getFileName().toString() + " (" + entries.size() + ")" + (dirty ? " *" : "");
   }
   
   public void markDirty() 

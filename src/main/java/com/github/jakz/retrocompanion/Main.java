@@ -100,11 +100,19 @@ public class Main
     }
     
     @Override
+    public void refreshPlaylistMetadata()
+    {
+      playlistInfoPanel.refresh();
+      mainPanel.playlistChooser.repaint();
+
+    }
+    
+    @Override
     public void refreshPlaylist()
     {
       playlistPanel.refresh();
-      mainPanel.playlistChooser.repaint();
       entryInfoPanel.setEntry(null);
+      refreshPlaylistMetadata();
     }
     
     @Override
@@ -151,6 +159,7 @@ public class Main
       playlistPanel.setPlaylist(playlist);
       mainPanel.playlistChooser.repaint();
       entryInfoPanel.setEntry(null);
+      playlistInfoPanel.setPlaylist(playlist);
     }
     
     @Override
@@ -162,6 +171,9 @@ public class Main
         .map(playlist::indexOf)
         .filter(i -> i != -1)
         .forEach(playlist::remove);
+      
+      if (!entries.isEmpty())
+        playlist.markDirty();
   
       refreshPlaylist();
     }

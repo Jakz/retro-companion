@@ -23,6 +23,7 @@ import javax.swing.JTable;
 import javax.swing.TransferHandler;
 
 import com.github.jakz.retrocompanion.data.Entry;
+import com.github.jakz.retrocompanion.data.Playlist;
 import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.FolderScanner;
@@ -88,7 +89,7 @@ public class PlaylistTableTransferHandler extends TransferHandler
 
     try 
     {
-      ModifiableDataSource<Entry> data = (ModifiableDataSource<Entry>)model.data();
+      Playlist data = (Playlist)model.data();
       
       if (info.isDataFlavorSupported(localObjectFlavor))
       {
@@ -123,6 +124,12 @@ public class PlaylistTableTransferHandler extends TransferHandler
           for (Entry value : values)
             data.add(cindex++, value);
           
+          if (!values.isEmpty())
+          {
+            data.markDirty();
+            mediator.refreshPlaylistMetadata();
+          }
+          
           table.getSelectionModel().setSelectionInterval(index, cindex-1);
         }
       }
@@ -134,7 +141,11 @@ public class PlaylistTableTransferHandler extends TransferHandler
         int count = recursiveAdd(index, paths);
         
         if (count > 0)
+        {
           table.getSelectionModel().setSelectionInterval(index, index+count-1);
+          data.markDirty();
+          mediator.refreshPlaylistMetadata();
+        }
       }
       
       return true;

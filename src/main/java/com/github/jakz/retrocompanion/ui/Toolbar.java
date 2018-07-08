@@ -114,7 +114,7 @@ public class Toolbar extends JToolBar
     
     JButton addEntry = new JButton(Icon.ADD_ENTRY.icon(24));
     addEntry.setToolTipText(Strings.HELP_ADD_NEW_ENTRY.text());
-    addEntry.addActionListener(e -> Tasks.addEntryToPlaylist(mediator));
+    addEntry.addActionListener(e -> executePlaylistTask(PlaylistTask.AddNewEntryToPlaylist));
     add(addEntry);   
     
     JButton deleteSelectionButton = new JButton(Icon.DELETE_ENTRY.icon(24));

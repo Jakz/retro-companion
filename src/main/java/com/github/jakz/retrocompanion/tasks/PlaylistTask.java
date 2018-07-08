@@ -2,7 +2,11 @@ package com.github.jakz.retrocompanion.tasks;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
 
+import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.tasks.Tasks.Standalone;
 import com.github.jakz.retrocompanion.ui.Mediator;
@@ -34,6 +38,25 @@ public interface PlaylistTask
       Standalone.sortPlaylistAlphabetically(playlist);      
       mediator.refreshPlaylist();
     }
+    
+    return true;
+  };
+  
+  public static final PlaylistTask AddNewEntryToPlaylist = (mediator, playlist) ->
+  {
+    List<Entry> entries = mediator.getSelectedEntries();
+    
+    int index = entries.stream()
+      .map(playlist::indexOf)
+      .max(Integer::compare)
+      .orElse(playlist.size());
+    
+    Entry entry = new Entry(playlist, Paths.get("locate.me"), "Name", Optional.empty(), Optional.empty());
+    playlist.add(index, entry);
+    
+    playlist.markDirty();
+    mediator.refreshPlaylist();
+    mediator.selectEntry(entry);  
     
     return true;
   };

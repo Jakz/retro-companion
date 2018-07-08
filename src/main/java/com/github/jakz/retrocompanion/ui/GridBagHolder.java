@@ -19,6 +19,7 @@ class GridBagHolder
   public GridBagHolder leftInsets(int v) { c.insets = new Insets(0, v, 0, 0); return this; }
   public GridBagHolder rightInsets(int v) { c.insets = new Insets(0, 0, 0, v); return this; }
   public GridBagHolder bottomInsets(int v) { c.insets = new Insets(0, 0, v, 0); return this; }
+  public GridBagHolder hInsets(int v) { c.insets = new Insets(0, v, 0, v); return this; }
   public GridBagHolder insets(int v) { c.insets = new Insets(v, v, v, v); return this; }
   public GridBagHolder noInsets() { c.insets = new Insets(0,0,0,0); return this; }
   
