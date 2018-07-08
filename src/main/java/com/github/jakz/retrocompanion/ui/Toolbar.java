@@ -93,9 +93,6 @@ public class Toolbar extends JToolBar
           }
         }
       }
-      
-
-      
     });
     
     add(newPlaylist);

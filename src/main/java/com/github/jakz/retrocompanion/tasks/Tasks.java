@@ -37,6 +37,9 @@ public class Tasks
       
       playlist.clear();
       entries.forEach(playlist::add);
+      
+      //TODO: we assume order is changed, not correct but efficient
+      playlist.markDirty();
     }
     
     public static void makePathsRelative(Playlist playlist, Path path)
