@@ -32,6 +32,7 @@ public class Options
   public Path infoPath;
   public Path savesPath;
   public Path statesPath;
+  public Path themePath;
   
   public boolean autoFixPlaylistNamesInEntries;
   public boolean overwriteThumbnailWithoutConfirmation;
@@ -62,6 +63,7 @@ public class Options
     
     coresPath = retroarchPath.resolve("cores");
     infoPath = retroarchPath.resolve("info");
+    themePath = retroarchPath.resolve("assets/xmb/retroactive/png");
     
     if (os == OperatingSystem.OSX)
     {

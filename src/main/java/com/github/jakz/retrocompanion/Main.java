@@ -25,6 +25,7 @@ import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
 import com.github.jakz.retrocompanion.ui.MainPanel;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.OptionsPanel;
+import com.github.jakz.retrocompanion.ui.PlaylistInfoPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.WrapperFrame;
@@ -79,6 +80,7 @@ public class Main
 
   private static EntryInfoPanel entryInfoPanel;
   private static PlaylistTablePanel playlistPanel;
+  private static PlaylistInfoPanel playlistInfoPanel;
   
   private static class MyMediator implements Mediator
   {
@@ -249,6 +251,7 @@ public class Main
       mainPanel = new MainPanel(mediator);
       Main.playlistPanel = mainPanel.playlistPanel;
       Main.entryInfoPanel = mainPanel.entryInfoPanel;
+      Main.playlistInfoPanel = mainPanel.playlistInfoPanel;
       
       mainFrame = UIUtils.buildFrame(mainPanel, "RetroCompanion v0.1");
       mainFrame.exitOnClose();

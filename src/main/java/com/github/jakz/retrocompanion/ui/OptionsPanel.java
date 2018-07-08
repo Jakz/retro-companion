@@ -1,5 +1,6 @@
 package com.github.jakz.retrocompanion.ui;
 
+import java.awt.Color;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 
@@ -8,6 +9,7 @@ import javax.swing.BoxLayout;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.border.Border;
 
 import com.github.jakz.retrocompanion.Option;
 import com.github.jakz.retrocompanion.Options;
@@ -17,10 +19,20 @@ public class OptionsPanel extends JPanel
 {
   private final Mediator mediator;
   
-  private final String[] captions = { "RetroArch Path", "Cores Path", "Info Path", "Playlists Path", "Thumbnails Path", "Save States Paths", "Saves Path"};
+  private final String[] captions = { "RetroArch Path", "Cores Path", "Info Path", "Playlists Path", "Thumbnails Path", "Save States Paths", "Saves Path", "Theme Path"};
   private final BrowseButton[] browseFields;
   
   private final Option<?>[] optionFields;
+  
+  public Border sectionBorder(String title)
+  {
+    return 
+      BorderFactory.createCompoundBorder(
+        BorderFactory.createTitledBorder(
+            BorderFactory.createLineBorder(Color.GRAY), title), 
+        BorderFactory.createEmptyBorder(5,5,5,5)
+      );
+  }
     
   public OptionsPanel(Mediator mediator)
   {
@@ -42,7 +54,7 @@ public class OptionsPanel extends JPanel
     // paths panel
     JPanel pathsPanel = new JPanel();
     
-    pathsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Paths"), BorderFactory.createEmptyBorder(5,5,5,5)));
+    pathsPanel.setBorder(sectionBorder("Paths"));
     pathsPanel.setLayout(new GridBagLayout());
 
     c.w(0.5f, 0.5f);
@@ -68,7 +80,7 @@ public class OptionsPanel extends JPanel
      
     // options panel
     JPanel optionsPanel = new JPanel();
-    optionsPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createTitledBorder("Options"), BorderFactory.createEmptyBorder(5,5,5,5)));
+    optionsPanel.setBorder(sectionBorder("Options"));
     optionsPanel.setLayout(new GridBagLayout());
     
     c.w(1).noInsets().left();
@@ -80,6 +92,7 @@ public class OptionsPanel extends JPanel
       optionsPanel.add(option.getComponent(), c.g(0, i).c());
     }
 
+    setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
     setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
     add(pathsPanel);
     add(optionsPanel);
@@ -97,6 +110,8 @@ public class OptionsPanel extends JPanel
     browseFields[4].setText(options.thumbnailsPath.toString());
     browseFields[5].setText(options.statesPath.toString());
     browseFields[6].setText(options.savesPath.toString());
+    browseFields[7].setText(options.themePath.toString());
+
     
     for (Option<?> option : optionFields) option.refresh();
   }
@@ -112,5 +127,6 @@ public class OptionsPanel extends JPanel
     options.thumbnailsPath = browseFields[4].getPath();
     options.statesPath = browseFields[5].getPath();
     options.savesPath = browseFields[6].getPath();
+    options.themePath = browseFields[7].getPath();
   }
 }

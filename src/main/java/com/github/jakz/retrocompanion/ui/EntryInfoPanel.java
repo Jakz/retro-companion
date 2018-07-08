@@ -49,6 +49,8 @@ public class EntryInfoPanel extends JPanel
   {
     this.mediator = mediator;
     
+    setBorder(BorderFactory.createTitledBorder(BorderFactory.createLineBorder(Color.GRAY), "Entry Information"));
+    
     thumbnailPopupMenu = new ThumbnailPopupMenu();
     
     entryName = new JLabel();

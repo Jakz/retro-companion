@@ -13,6 +13,7 @@ public class MainPanel extends JPanel
 {
   public final PlaylistTablePanel playlistPanel;
   public final EntryInfoPanel entryInfoPanel;
+  public final PlaylistInfoPanel playlistInfoPanel;
   public final Toolbar toolbar;
   public final JComboBox<Playlist> playlistChooser;
   
@@ -22,6 +23,7 @@ public class MainPanel extends JPanel
     playlistChooser = new JComboBox<>();
     entryInfoPanel = new EntryInfoPanel(mediator);
     playlistPanel = new PlaylistTablePanel(mediator);
+    playlistInfoPanel = new PlaylistInfoPanel(mediator);
     
     playlistChooser.addItemListener(e -> {
       mediator.onPlaylistSelected(playlistChooser.getItemAt(playlistChooser.getSelectedIndex()));
@@ -34,7 +36,8 @@ public class MainPanel extends JPanel
     
     JPanel rightPanel = new JPanel(new BorderLayout());
     
-    rightPanel.add(entryInfoPanel, BorderLayout.PAGE_START);
+    rightPanel.add(entryInfoPanel, BorderLayout.PAGE_END);
+    rightPanel.add(playlistInfoPanel, BorderLayout.PAGE_START);
     
     mainContent.add(playlistChooser, BorderLayout.PAGE_START);
     mainContent.add(playlistPanel, BorderLayout.CENTER);
