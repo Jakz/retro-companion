@@ -9,6 +9,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.tasks.PlaylistTask;
+import com.github.jakz.retrocompanion.tasks.Tasks;
 
 public class PlaylistInfoPanel extends JPanel
 {
@@ -37,6 +39,8 @@ public class PlaylistInfoPanel extends JPanel
     add(nameCaption, c.g(0, 0).w(1).leftInsets(10).left().c());  
     add(nameField, c.g(1, 0).w(3).center().hfill().c());  
     add(countLabel, c.g(4, 0).left().hInsets(10).c());
+    
+    nameField.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.RenamePlaylist(nameField.getText())));
   }
   
   public void setPlaylist(Playlist playlist)

@@ -93,4 +93,19 @@ public interface PlaylistTask
       throw new TaskException("Excepton while deleting playlist", e);
     }
   };
+  
+  public static PlaylistTask RenamePlaylist(String name)
+  {
+    return (mediator, playlist) ->
+    {
+      if (playlist.name().equals(name))
+        return false;
+      else
+      {
+        
+      }
+      
+      return true;
+    };
+  }
 }

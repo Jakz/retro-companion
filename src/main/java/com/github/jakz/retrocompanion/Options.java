@@ -89,6 +89,11 @@ public class Options
       .resolve(type.folderName)
       .resolve(game.name().replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
   }
+  
+  public Path[] pathsForPlaylistIcon(String playlistName)
+  {
+    return new Path[] { themePath.resolve(playlistName + ".png"), themePath.resolve(playlistName + "-content.png") };
+  }
     
   void save(Path path) throws IOException
   {

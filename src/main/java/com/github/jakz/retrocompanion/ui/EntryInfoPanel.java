@@ -25,18 +25,16 @@ import org.imgscalr.Scalr;
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.ui.FileTransferHandler;
 
 public class EntryInfoPanel extends JPanel
 {
-  private final int THUMBNAIL_SIZE = 120;
-  private final int THUMBNAIL_MARGIN = 10;
-  
   private Mediator mediator;
   
   private Entry entry;
   
-  private JLabel[] thumbnails;
+  private ThumbnailBox[] thumbnails;
   private JLabel entryName;
   private JLabel entryPath;
   
@@ -59,7 +57,7 @@ public class EntryInfoPanel extends JPanel
     entryPath = new JLabel();
     entryPath.setPreferredSize(new Dimension(400, 20));
 
-    thumbnails = new JLabel[enabledThumbnails().length];
+    thumbnails = new ThumbnailBox[enabledThumbnails().length];
     
     setLayout(new GridBagLayout());
 
@@ -80,15 +78,11 @@ public class EntryInfoPanel extends JPanel
     {
       final ThumbnailType type = enabledThumbnails()[i];
       
-      thumbnails[i] = new JLabel();
+      thumbnails[i] = new ThumbnailBox(120, 10);
       thumbnails[i].setText(ThumbnailType.values()[i].name);
       thumbnails[i].setFont(thumbnails[i].getFont().deriveFont(20.0f));
-      thumbnails[i].setOpaque(true);
       thumbnails[i].setForeground(new Color(0, 0, 0, 180));
       thumbnails[i].setBackground(Color.GRAY);
-      thumbnails[i].setHorizontalTextPosition(JLabel.CENTER);
-      thumbnails[i].setHorizontalAlignment(JLabel.CENTER);
-      thumbnails[i].setPreferredSize(new Dimension(THUMBNAIL_SIZE + THUMBNAIL_MARGIN, THUMBNAIL_SIZE + THUMBNAIL_MARGIN));
       
       thumbnails[i].setTransferHandler(new FileTransferHandler(new ThumbnailDragDropListener(type)));
       
@@ -116,49 +110,42 @@ public class EntryInfoPanel extends JPanel
   public void setEntry(Entry entry)
   {
     this.entry = entry;
-    
-    try 
+
+    if (entry != null)
     {
-      if (entry != null)
+      for (int i = 0; i < enabledThumbnails().length; ++i)
       {
-        for (int i = 0; i < enabledThumbnails().length; ++i)
+        ThumbnailType type = enabledThumbnails()[i];
+        
+        Path boxartPath = mediator.options().pathForThumbnail(entry.playlist(), type, entry);
+        
+        if (Files.exists(boxartPath))
         {
-          ThumbnailType type = enabledThumbnails()[i];
-          
-          Path boxartPath = mediator.options().pathForThumbnail(entry.playlist(), type, entry);
-          
-          if (Files.exists(boxartPath))
-          {
-            thumbnails[i].setIcon(new ImageIcon(Scalr.resize(ImageIO.read(boxartPath.toFile()), THUMBNAIL_SIZE)));
-            //thumbnails[i].setVerticalTextPosition(JLabel.BOTTOM);
-          }
-          else
-          {
-            thumbnails[i].setIcon(null);
-            //thumbnails[i].setVerticalTextPosition(JLabel.CENTER);
-          }
+          thumbnails[i].setImage(boxartPath);
+          //thumbnails[i].setVerticalTextPosition(JLabel.BOTTOM);
         }
-        
-        entryName.setText("Name: "+entry.name());
-        entryPath.setText("Path: "+entry.path);
-
+        else
+        {
+          thumbnails[i].clearImage();
+          //thumbnails[i].setVerticalTextPosition(JLabel.CENTER);
+        }
       }
-      else
-      {
-        entryName.setText("Name:");
-        entryPath.setText("Path:");
-        
-        for (JLabel thumbnail : thumbnails)
-          thumbnail.setIcon(null);
-        
-        //for (JLabel thumbnail : thumbnails)
-          //thumbnail.setVerticalTextPosition(JLabel.CENTER);
+      
+      entryName.setText("Name: "+entry.name());
+      entryPath.setText("Path: "+entry.path);
 
-      }
-    } 
-    catch (IllegalArgumentException | ImagingOpException | IOException e)
+    }
+    else
     {
-      e.printStackTrace();
+      entryName.setText("Name:");
+      entryPath.setText("Path:");
+      
+      for (JLabel thumbnail : thumbnails)
+        thumbnail.setIcon(null);
+      
+      //for (JLabel thumbnail : thumbnails)
+        //thumbnail.setVerticalTextPosition(JLabel.CENTER);
+
     }
   }
   
@@ -191,12 +178,15 @@ public class EntryInfoPanel extends JPanel
             
             if (Files.exists(dest))
             {
-              if (mediator.options().overwriteThumbnailWithoutConfirmation)
-                Files.delete(dest);
-              else
+              if (!mediator.options().overwriteThumbnailWithoutConfirmation)
               {
-                // TODO: ask for confirmation and proceed in case
+                boolean confirm = Tasks.askForConfirmation(mediator, "Do you want to overwrite existing thumbnail?");
+                
+                if (!confirm)
+                  return;
               }
+              
+              Files.delete(dest);
             }
             
             Files.createDirectories(dest.getParent());

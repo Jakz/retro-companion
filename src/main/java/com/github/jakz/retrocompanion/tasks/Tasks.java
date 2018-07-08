@@ -165,4 +165,21 @@ public class Tasks
     
     return false;
   }
+  
+  public static void executeTaskUI(Mediator mediator, EntryTask task)
+  {
+    executeTaskUI(mediator, PlaylistTask.of(task));
+  }
+  
+  public static void executeTaskUI(Mediator mediator, PlaylistTask task)
+  {
+    try
+    {
+      Tasks.executePlaylistTask(mediator, task, mediator.playlist());
+    }
+    catch (TaskException e)
+    {
+      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+    }
+  }
 }

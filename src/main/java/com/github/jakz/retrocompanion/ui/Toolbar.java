@@ -99,19 +99,19 @@ public class Toolbar extends JToolBar
     
     JButton deletePlaylist = new JButton(Icon.DELETE_PLAYLIST.icon(24));
     deletePlaylist.setToolTipText("Delete current playlist"); //TODO: localize
-    deletePlaylist.addActionListener(e -> executePlaylistTask(PlaylistTask.DeletePlaylist));
+    deletePlaylist.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.DeletePlaylist));
     add(deletePlaylist);
 
     JButton save = new JButton(Icon.SAVE.icon(24));
     save.setToolTipText("Save playlist"); //TODO: localize
-    save.addActionListener(e -> executePlaylistTask(PlaylistTask.SavePlaylist));
+    save.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.SavePlaylist));
     add(save);
     
     addSeparator();
     
     JButton addEntry = new JButton(Icon.ADD_ENTRY.icon(24));
     addEntry.setToolTipText(Strings.HELP_ADD_NEW_ENTRY.text());
-    addEntry.addActionListener(e -> executePlaylistTask(PlaylistTask.AddNewEntryToPlaylist));
+    addEntry.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.AddNewEntryToPlaylist));
     add(addEntry);   
     
     JButton deleteSelectionButton = new JButton(Icon.DELETE_ENTRY.icon(24));
@@ -123,17 +123,17 @@ public class Toolbar extends JToolBar
     
     JButton sortButton = new JButton(Icon.SORT_AZ.icon(24));
     sortButton.setToolTipText(Strings.HELP_SORT_PLAYLIST_TOOLTIP.text());
-    sortButton.addActionListener(e -> executePlaylistTask(PlaylistTask.SortPlaylistAlphabetically));
+    sortButton.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.SortPlaylistAlphabetically));
     add(sortButton);
     
     JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));
     removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
-    removeTags.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.RemoveTagsFromName));
+    removeTags.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.RemoveTagsFromName));
     add(removeTags);
     
     JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(24));
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
-    renameToFilename.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.RenameEntryToMatchFileName));
+    renameToFilename.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.RenameEntryToMatchFileName));
     add(renameToFilename);
 
     JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
@@ -170,23 +170,6 @@ public class Toolbar extends JToolBar
     setFloatable(false);
   }
   
-  public void executeEntryTaskOnPlaylist(EntryTask task)
-  {
-    executePlaylistTask(PlaylistTask.of(task));
-  }
-  
-  private void executePlaylistTask(PlaylistTask task)
-  {
-    try
-    {
-      Tasks.executePlaylistTask(mediator, task, mediator.playlist());
-    }
-    catch (TaskException e)
-    {
-      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
-    }
-  }
-  
   private class CoreSelectMenu extends JPopupMenu
   {
     public CoreSelectMenu(CoreSet set)
@@ -195,7 +178,7 @@ public class Toolbar extends JToolBar
           .collect(Collectors.groupingBy(Core::systemName, () -> new TreeMap<>(), Collectors.toList()));
       
       JMenuItem detect = new JMenuItem("Auto-Detect"); //TODO: localize
-      detect.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.AssignCore(Optional.empty())));
+      detect.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.AssignCore(Optional.empty())));
       add(detect);
       
       coreBySystem.forEach((k, cores) -> {
@@ -205,7 +188,7 @@ public class Toolbar extends JToolBar
         for (Core core : cores)
         {
           JMenuItem coreItem = new JMenuItem(core.shortLibraryName());
-          coreItem.addActionListener(e -> executeEntryTaskOnPlaylist(EntryTask.AssignCore(Optional.ofNullable(new Core.Ref(core)))));
+          coreItem.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.AssignCore(Optional.ofNullable(new Core.Ref(core)))));
           menu.add(coreItem);
         }
       });
