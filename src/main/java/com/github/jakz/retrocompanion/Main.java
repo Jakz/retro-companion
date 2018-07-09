@@ -210,6 +210,12 @@ public class Main
     }
     
     @Override
+    public List<Playlist> playlists()
+    {
+      return playlists;
+    }
+    
+    @Override
     public Container modalTarget()
     {
       return mainPanel;

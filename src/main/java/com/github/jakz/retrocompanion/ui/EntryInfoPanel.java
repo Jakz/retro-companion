@@ -3,6 +3,7 @@ package com.github.jakz.retrocompanion.ui;
 import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -10,6 +11,7 @@ import java.awt.image.ImagingOpException;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 
 import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
@@ -18,13 +20,14 @@ import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.TransferHandler;
+import javax.swing.border.TitledBorder;
 
 import org.imgscalr.Scalr;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.github.jakz.retrocompanion.tasks.BatchTask;
 import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.ui.FileTransferHandler;
 
@@ -80,11 +83,13 @@ public class EntryInfoPanel extends JPanel
       
       thumbnails[i] = new ThumbnailBox(120, 10);
       thumbnails[i].setText(ThumbnailType.values()[i].name);
-      thumbnails[i].setFont(thumbnails[i].getFont().deriveFont(20.0f));
-      thumbnails[i].setForeground(new Color(0, 0, 0, 180));
-      thumbnails[i].setBackground(Color.GRAY);
       
-      thumbnails[i].setTransferHandler(new FileTransferHandler(new ThumbnailDragDropListener(type)));
+      thumbnails[i].setTransferHandler(new FileTransferHandler(new ThumbnailBoxDropListener(
+          mediator,
+          files -> entry != null && files.length == 1,
+          () -> pathForThumbnail(type), 
+          () -> setEntry(entry)
+      )));
       
       thumbnails[i].addMouseListener(new MouseAdapter() {
         private void handlePopup(MouseEvent e)
@@ -118,17 +123,7 @@ public class EntryInfoPanel extends JPanel
         ThumbnailType type = enabledThumbnails()[i];
         
         Path boxartPath = mediator.options().pathForThumbnail(entry.playlist(), type, entry);
-        
-        if (Files.exists(boxartPath))
-        {
-          thumbnails[i].setImage(boxartPath);
-          //thumbnails[i].setVerticalTextPosition(JLabel.BOTTOM);
-        }
-        else
-        {
-          thumbnails[i].clearImage();
-          //thumbnails[i].setVerticalTextPosition(JLabel.CENTER);
-        }
+        thumbnails[i].setImage(boxartPath);
       }
       
       entryName.setText("Name: "+entry.name());
@@ -140,8 +135,8 @@ public class EntryInfoPanel extends JPanel
       entryName.setText("Name:");
       entryPath.setText("Path:");
       
-      for (JLabel thumbnail : thumbnails)
-        thumbnail.setIcon(null);
+      for (ThumbnailBox thumbnail : thumbnails)
+        thumbnail.clearImage();
       
       //for (JLabel thumbnail : thumbnails)
         //thumbnail.setVerticalTextPosition(JLabel.CENTER);
@@ -154,59 +149,6 @@ public class EntryInfoPanel extends JPanel
     return entry;
   }
   
-  private class ThumbnailDragDropListener implements FileTransferHandler.Listener
-  {
-    private final ThumbnailType type;
-    
-    ThumbnailDragDropListener(ThumbnailType type)
-    {
-      this.type = type;
-    }
-    
-    @Override
-    public void filesDropped(TransferHandler.TransferSupport info, Path[] files)
-    {
-      try
-      {
-        if (entry != null && files.length == 1)
-        {
-          Path source = files[0];
-        
-          if (source.getFileName().toString().toLowerCase().endsWith(".png"))
-          {
-            Path dest = pathForThumbnail(type);
-            
-            if (Files.exists(dest))
-            {
-              if (!mediator.options().overwriteThumbnailWithoutConfirmation)
-              {
-                boolean confirm = Tasks.askForConfirmation(mediator, "Do you want to overwrite existing thumbnail?");
-                
-                if (!confirm)
-                  return;
-              }
-              
-              Files.delete(dest);
-            }
-            
-            Files.createDirectories(dest.getParent());
-            
-            if (mediator.options().thumbnailMoveInsteadThanCopy)
-              Files.move(source, dest);
-            else
-              Files.copy(source, dest);
-            
-            EntryInfoPanel.this.setEntry(entry);
-          }
-        }
-      }
-      catch (IOException e)
-      {
-        e.printStackTrace();
-      } 
-    }
-  }
-  
   private class ThumbnailPopupMenu extends JPopupMenu
   {
     ThumbnailType type;
@@ -215,41 +157,14 @@ public class EntryInfoPanel extends JPanel
     {
       JMenuItem deleteFromDisk = new JMenuItem(Strings.DELETE_FROM_DISK.text());
       this.add(deleteFromDisk);
-      
-      deleteFromDisk.addActionListener(event -> {
-        try
-        {
-          Path path = pathForThumbnail(type);
-          
-          //TODO: confirmation?
-          if (path != null && Files.exists(path))
-            Files.delete(path);
-          
-          EntryInfoPanel.this.setEntry(entry);
-        }
-        catch (IOException e)
-        {
-          e.printStackTrace();
-        }
+      deleteFromDisk.addActionListener(e -> {
+        Tasks.executeTaskUI(mediator, Tasks.DeleteFileFromDisk(() -> pathForThumbnail(type)));
+        setEntry(entry);
       });
       
       JMenuItem showInExplorer = new JMenuItem(Strings.OPEN_IN_FILE_EXPLORER.text());
       this.add(showInExplorer);
-      
-      showInExplorer.addActionListener(event -> {
-        try
-        {
-          Path path = pathForThumbnail(type);
-        
-          //TODO: highlight the file
-          if (path != null && Files.exists(path))
-            Desktop.getDesktop().open(path.getParent().toFile());
-        }
-        catch (IOException e)
-        {
-          e.printStackTrace();
-        }
-      });
+      showInExplorer.addActionListener(e -> Tasks.executeTaskUI(mediator, Tasks.OpenFileInExplorer(() -> pathForThumbnail(type))));
     }
     
     void setType(ThumbnailType type) { this.type = type; }

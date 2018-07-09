@@ -24,6 +24,7 @@ public enum Icon
   NEW_PLAYLIST("new"),
   DELETE_PLAYLIST("delete"),
   
+  RETROARCH("retroarch"),
   OPTIONS("options")
   ;
   

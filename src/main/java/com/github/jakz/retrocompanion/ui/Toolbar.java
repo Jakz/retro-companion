@@ -40,11 +40,13 @@ public class Toolbar extends JToolBar
   private final Mediator mediator;
   private CoreSelectMenu coreSelectMenu;
 
+  private final int ICON_SIZE = 32;
+  
   public Toolbar(Mediator mediator)
   {
     this.mediator = mediator;
     
-    JButton newPlaylist = new JButton(Icon.NEW_PLAYLIST.icon(24));
+    JButton newPlaylist = new JButton(Icon.NEW_PLAYLIST.icon(ICON_SIZE));
     newPlaylist.setToolTipText("New playlist"); //TODO: localize
     newPlaylist.addActionListener(e -> {
       if (!Files.exists(mediator.options().playlistsPath))
@@ -97,56 +99,56 @@ public class Toolbar extends JToolBar
     
     add(newPlaylist);
     
-    JButton deletePlaylist = new JButton(Icon.DELETE_PLAYLIST.icon(24));
+    JButton deletePlaylist = new JButton(Icon.DELETE_PLAYLIST.icon(ICON_SIZE));
     deletePlaylist.setToolTipText("Delete current playlist"); //TODO: localize
     deletePlaylist.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.DeletePlaylist));
     add(deletePlaylist);
 
-    JButton save = new JButton(Icon.SAVE.icon(24));
+    JButton save = new JButton(Icon.SAVE.icon(ICON_SIZE));
     save.setToolTipText("Save playlist"); //TODO: localize
     save.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.SavePlaylist));
     add(save);
     
     addSeparator();
     
-    JButton addEntry = new JButton(Icon.ADD_ENTRY.icon(24));
+    JButton addEntry = new JButton(Icon.ADD_ENTRY.icon(ICON_SIZE));
     addEntry.setToolTipText(Strings.HELP_ADD_NEW_ENTRY.text());
     addEntry.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.AddNewEntryToPlaylist));
     add(addEntry);   
     
-    JButton deleteSelectionButton = new JButton(Icon.DELETE_ENTRY.icon(24));
+    JButton deleteSelectionButton = new JButton(Icon.DELETE_ENTRY.icon(ICON_SIZE));
     deleteSelectionButton.setToolTipText(Strings.HELP_REMOVE_SELECTION_TOOLTIP.text());
     deleteSelectionButton.addActionListener(e -> Tasks.removeSelectedEntriesFromPlaylist(mediator));
     add(deleteSelectionButton);   
     
     addSeparator();
     
-    JButton sortButton = new JButton(Icon.SORT_AZ.icon(24));
+    JButton sortButton = new JButton(Icon.SORT_AZ.icon(ICON_SIZE));
     sortButton.setToolTipText(Strings.HELP_SORT_PLAYLIST_TOOLTIP.text());
     sortButton.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.SortPlaylistAlphabetically));
     add(sortButton);
     
-    JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(24));
+    JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(ICON_SIZE));
     removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
     removeTags.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.RemoveTagsFromName));
     add(removeTags);
     
-    JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(24));
+    JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(ICON_SIZE));
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
     renameToFilename.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.RenameEntryToMatchFileName));
     add(renameToFilename);
 
-    JButton relativize = new JButton(Icon.RELATIVIZE.icon(24));
+    JButton relativize = new JButton(Icon.RELATIVIZE.icon(ICON_SIZE));
     relativize.setToolTipText(Strings.HELP_RELATIVIZE_TO_RETROARCH.text());
     relativize.addActionListener(e -> Tasks.relativizePathsToRetroarch(mediator));
     add(relativize);
     
-    JButton makeAbsolute = new JButton(Icon.MAKE_ABSOLUTE.icon(24));
+    JButton makeAbsolute = new JButton(Icon.MAKE_ABSOLUTE.icon(ICON_SIZE));
     makeAbsolute.setToolTipText(Strings.HELP_MAKE_ABSOLUTE_PATHS.text());
     makeAbsolute.addActionListener(e -> Tasks.makePathsAbsolute(mediator));
     add(makeAbsolute);
     
-    JButton setCore = new JButton(Icon.SET_CORE.icon(24));
+    JButton setCore = new JButton(Icon.SET_CORE.icon(ICON_SIZE));
     setCore.setToolTipText("Set same core for all entries");
     
     setCore.addMouseListener(new MouseAdapter() {
@@ -162,7 +164,12 @@ public class Toolbar extends JToolBar
     
     add(Box.createHorizontalGlue());
     
-    JButton options = new JButton(Icon.OPTIONS.icon(24));
+    JButton launchRetroarch = new JButton(Icon.RETROARCH.icon(ICON_SIZE));
+    launchRetroarch.setToolTipText("Launch RetroArch"); //TODO: localize
+    launchRetroarch.addActionListener(e -> Tasks.executeTaskUI(mediator, Tasks.LaunchRetroarch));
+    add(launchRetroarch);
+    
+    JButton options = new JButton(Icon.OPTIONS.icon(ICON_SIZE));
     options.setToolTipText("Options"); //TODO: localize
     options.addActionListener(e -> mediator.showOptions());
     add(options);

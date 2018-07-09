@@ -1,5 +1,6 @@
 package com.github.jakz.retrocompanion.tasks;
 
+import java.awt.Desktop;
 import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -9,7 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.github.jakz.retrocompanion.Options;
@@ -24,9 +27,70 @@ import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.UIUtils;
+import com.pixbits.lib.ui.UIUtils.OperatingSystem;
 
 public class Tasks
 {
+  public static BatchTask LaunchRetroarch = mediator -> {
+    try
+    {
+      OperatingSystem os = UIUtils.getOperatingSystem();
+      String executableName = os.isWindows() ? "retroarch.exe" : "retroarch";
+      Path executablePath = mediator.options().retroarchPath.resolve(executableName);   
+      Runtime.getRuntime().exec(executablePath.toString());
+      return true;
+    }
+    catch (Exception e)
+    {
+      throw new TaskException("Exception while launching RetroArch", e);
+    }
+  };
+  
+  public static BatchTask DeleteFileFromDisk(Supplier<Path> supplier)
+  {
+    return mediator -> {
+      Path path = supplier.get();
+
+      try
+      { 
+        //TODO: confirmation?
+        if (path != null && Files.exists(path))
+        {
+          Files.delete(path);
+          return true;
+        }
+        
+        return false;
+      }
+      catch (IOException ex)
+      {
+        throw new TaskException("Exception while deleting " + path.toString() + " from disk", ex);
+      }
+    };
+  }
+  
+  public static BatchTask OpenFileInExplorer(Supplier<Path> supplier)
+  {
+    return mediator -> {
+      Path path = supplier.get();
+      try
+      {
+        //TODO: highlight the file
+        if (path != null && Files.exists(path))
+        {
+          Desktop.getDesktop().open(path.getParent().toFile());
+          return true;
+        }
+        
+        return false;
+      }
+      catch (IOException ex)
+      {
+        throw new TaskException("Exception while opening folder for " + path.toString(), ex);
+      }
+    };
+  }
+  
   public static class Standalone
   {
     public static void sortPlaylistAlphabetically(Playlist playlist)
@@ -176,6 +240,18 @@ public class Tasks
     try
     {
       Tasks.executePlaylistTask(mediator, task, mediator.playlist());
+    }
+    catch (TaskException e)
+    {
+      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+    }
+  }
+  
+  public static void executeTaskUI(Mediator mediator, BatchTask task)
+  {
+    try
+    {
+      task.process(mediator);
     }
     catch (TaskException e)
     {

@@ -9,12 +9,12 @@ import com.pixbits.lib.functional.StreamException;
 @FunctionalInterface
 public interface BatchTask
 {
-  public boolean process(Mediator mediator, List<Playlist> playlists);
+  public boolean process(Mediator mediator) throws TaskException;
   
   public static BatchTask of(PlaylistTask task)
   {
-    return (mediator, playlists) -> {
-      boolean successOnAny = playlists.stream()
+    return mediator -> {
+      boolean successOnAny = mediator.playlists().stream()
           .map(StreamException.rethrowFunction(playlist -> Tasks.executePlaylistTask(mediator, task, playlist)))
           .reduce(false, Boolean::logicalOr);
       

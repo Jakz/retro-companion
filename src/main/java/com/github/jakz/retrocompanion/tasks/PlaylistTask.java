@@ -1,10 +1,15 @@
 package com.github.jakz.retrocompanion.tasks;
 
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
+
+import javax.swing.JMenuItem;
 
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
@@ -90,7 +95,7 @@ public interface PlaylistTask
     }
     catch (IOException e)
     {
-      throw new TaskException("Excepton while deleting playlist", e);
+      throw new TaskException("Exception while deleting playlist", e);
     }
   };
   
@@ -106,6 +111,32 @@ public interface PlaylistTask
       }
       
       return true;
+    };
+  }
+  
+  public static PlaylistTask ImportIconsFromExisting(String name)
+  {
+    return (mediator, playlist) ->
+    {
+      try
+      {
+        Path[] destPaths = mediator.options().pathsForPlaylistIcon(playlist.name());
+        boolean anyExists = Files.exists(destPaths[0]) || Files.exists(destPaths[1]);
+      
+        if (anyExists && !mediator.options().overwriteThumbnailWithoutConfirmation && !Tasks.askForConfirmation(mediator, "Are you sure you want to override exising icons?"))
+          return false;
+      
+        Path[] srcPaths = mediator.options().pathsForPlaylistIcon(name);
+        
+        for (int i = 0; i < destPaths.length; ++i)
+          Files.copy(srcPaths[i], destPaths[i], StandardCopyOption.REPLACE_EXISTING);
+        
+        return true;
+      }
+      catch (IOException e)
+      {
+        throw new TaskException("Exception while importing icons for playlist", e);
+      }
     };
   }
 }

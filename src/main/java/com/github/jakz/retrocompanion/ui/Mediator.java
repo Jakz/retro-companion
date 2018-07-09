@@ -24,6 +24,7 @@ public interface Mediator
   public List<Entry> getSelectedEntries();
   public void removeEntriesFromPlaylist(List<Entry> entries);
   
+  public List<Playlist> playlists();
   public Playlist playlist();
   public Entry entry();
   public Options options();
