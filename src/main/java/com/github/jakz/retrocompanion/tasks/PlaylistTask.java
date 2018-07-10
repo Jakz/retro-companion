@@ -1,15 +1,12 @@
 package com.github.jakz.retrocompanion.tasks;
 
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.Optional;
-
-import javax.swing.JMenuItem;
 
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
@@ -107,7 +104,7 @@ public interface PlaylistTask
         return false;
       else
       {
-        
+        //TODO: finish
       }
       
       return true;

@@ -1,33 +1,21 @@
 package com.github.jakz.retrocompanion.ui;
 
 import java.awt.Color;
-import java.awt.Desktop;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.image.ImagingOpException;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.function.Function;
 
-import javax.imageio.ImageIO;
 import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.border.TitledBorder;
 
-import org.imgscalr.Scalr;
-
-import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
-import com.github.jakz.retrocompanion.tasks.BatchTask;
 import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.ui.FileTransferHandler;
 
@@ -127,7 +115,7 @@ public class EntryInfoPanel extends JPanel
       }
       
       entryName.setText("Name: "+entry.name());
-      entryPath.setText("Path: "+entry.path);
+      entryPath.setText("Path: "+entry.path());
 
     }
     else

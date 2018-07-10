@@ -1,8 +1,5 @@
 package com.github.jakz.retrocompanion.tasks;
 
-import java.util.List;
-
-import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.pixbits.lib.functional.StreamException;
 

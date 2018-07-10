@@ -5,21 +5,19 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayDeque;
 import java.util.Arrays;
-import java.util.Deque;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 import javax.swing.DefaultCellEditor;
 import javax.swing.DropMode;
@@ -31,27 +29,17 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextField;
-import javax.swing.TransferHandler;
 import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableCellRenderer;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
-import com.github.jakz.retrocompanion.data.DBRef;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
-import com.pixbits.lib.functional.StreamException;
-import com.pixbits.lib.io.FileUtils;
-import com.pixbits.lib.io.FolderScanner;
-import com.pixbits.lib.ui.FileTransferHandler;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
 import com.pixbits.lib.ui.table.SimpleListSelectionListener;
 import com.pixbits.lib.ui.table.TableModel;
-import com.pixbits.lib.ui.table.TableRowTransferHandler;
 import com.pixbits.lib.ui.table.editors.PathArgumentEditor;
 import com.pixbits.lib.ui.table.renderers.DefaultTableAndListRenderer;
 
@@ -64,6 +52,8 @@ public class PlaylistTablePanel extends JPanel
   private Model model;
   private Playlist playlist;
   
+  private final EntryPopupMenu entryPopupMenu;
+  
   @SuppressWarnings("unchecked")
   public PlaylistTablePanel(Mediator mediator)
   {
@@ -72,6 +62,7 @@ public class PlaylistTablePanel extends JPanel
     
     table = new JTable();
     model = new Model(table);
+    entryPopupMenu = new EntryPopupMenu(mediator);
     
     JScrollPane tablePane = new JScrollPane(table);
     tablePane.setPreferredSize(new Dimension(800, 400));
@@ -161,7 +152,7 @@ public class PlaylistTablePanel extends JPanel
       coreColumn.setEditor(new DefaultCellEditor(comboBox));
       coreColumn.setWidth(150);
       
-      ColumnSpec<Entry, Path> pathColumn = new ColumnSpec<Entry, Path>("Path", Entry.class.getField("path"), true);
+      ColumnSpec<Entry, Path> pathColumn = new ColumnSpec<Entry, Path>("Path", Path.class, e -> e.path());
       pathColumn.setEditor(new PathArgumentEditor(JFileChooser.FILES_ONLY));
       model.addColumn(pathColumn);
       
@@ -170,6 +161,28 @@ public class PlaylistTablePanel extends JPanel
       table.getSelectionModel().addListSelectionListener(SimpleListSelectionListener.ofJustSingle(i -> {
         mediator.onEntrySelected(i != -1 ? model.data().get(i) : null);      
       }));
+      
+      table.addMouseListener(new MouseAdapter() {
+        private void handlePopup(MouseEvent e)
+        {
+          if (e.isPopupTrigger())
+          {
+            int row = table.rowAtPoint(e.getPoint());
+            
+            if (row != -1)
+            {
+              table.setRowSelectionInterval(row, row);
+              Entry entry = model.data().get(table.convertRowIndexToModel(row));
+              entryPopupMenu.rebuild(entry);
+              entryPopupMenu.show(e.getComponent(), e.getX(), e.getY());
+
+            }
+          }
+        }
+        
+        @Override public void mousePressed(MouseEvent e) { handlePopup(e); }        
+        @Override public void mouseReleased(MouseEvent e) { handlePopup(e); }
+      });
       
       table.setDragEnabled(true);
       table.setDropMode(DropMode.INSERT_ROWS);

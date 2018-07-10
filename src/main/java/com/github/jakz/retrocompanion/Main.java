@@ -1,8 +1,6 @@
 package com.github.jakz.retrocompanion;
 
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Dimension;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -10,17 +8,11 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JFrame;
-
-import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
-import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.github.jakz.retrocompanion.parsers.CoreParser;
-import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.tasks.Tasks;
-import com.github.jakz.retrocompanion.ui.CoreTablePanel;
 import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
 import com.github.jakz.retrocompanion.ui.MainPanel;
 import com.github.jakz.retrocompanion.ui.Mediator;

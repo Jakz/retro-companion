@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import com.pixbits.lib.io.FileUtils;
-import com.pixbits.lib.ui.table.DataSource;
 import com.pixbits.lib.ui.table.ModifiableDataSource;
 
 public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>

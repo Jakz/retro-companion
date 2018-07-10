@@ -5,26 +5,17 @@ import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import com.github.jakz.retrocompanion.Options;
-import com.github.jakz.retrocompanion.data.Core;
-import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.parsers.PlaylistParser;
 import com.github.jakz.retrocompanion.ui.Mediator;
-import com.github.jakz.retrocompanion.ui.Toolbar;
-import com.pixbits.lib.functional.StreamException;
-import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.UIUtils.OperatingSystem;
@@ -230,9 +221,21 @@ public class Tasks
     return false;
   }
   
-  public static void executeTaskUI(Mediator mediator, EntryTask task)
+  public static void executeEntryTaskOnPlaylistUI(Mediator mediator, EntryTask task)
   {
     executeTaskUI(mediator, PlaylistTask.of(task));
+  }
+  
+  public static void executeTaskOnEntryUI(Mediator mediator, EntryTask task, Entry entry)
+  {
+    try
+    {
+      task.process(mediator, entry);
+    }
+    catch (TaskException e)
+    {
+      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+    }
   }
   
   public static void executeTaskUI(Mediator mediator, PlaylistTask task)

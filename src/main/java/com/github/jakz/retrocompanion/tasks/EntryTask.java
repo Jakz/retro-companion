@@ -1,11 +1,19 @@
 package com.github.jakz.retrocompanion.tasks;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Optional;
 
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.io.archive.ArchiveFormat;
+import com.pixbits.lib.io.archive.Compressible;
+import com.pixbits.lib.io.archive.Compressor;
+import com.pixbits.lib.io.archive.CompressorOptions;
 
 @FunctionalInterface
 public interface EntryTask
@@ -31,7 +39,7 @@ public interface EntryTask
   public static final EntryTask RenameEntryToMatchFileName = (mediator, entry) ->
   {
     String name = entry.name();
-    String newName = FileUtils.fileNameWithoutExtension(entry.path);
+    String newName = FileUtils.fileNameWithoutExtension(entry.path());
     
     if (!name.equals(newName))     
     {
@@ -48,6 +56,40 @@ public interface EntryTask
       entry.setCore(core.map(Core.Ref::dupe));
       return true;
     };
+  }
+  
+  public static EntryTask CompressEntry(ArchiveFormat format)
+  {
+    return (mediator, entry) -> {
+      try
+      {
+        if (!format.canWrite)
+          throw new TaskException("Format %s can't be compressed", format.extension());
+        
+        if (!Files.exists(entry.absolutePath(mediator)))
+          throw new TaskException("Entry file doesn't exist");
+
+        boolean isAlreadyArchive = ArchiveFormat.guessFormat(entry.path()) != null; 
+        
+        if (!isAlreadyArchive)
+        {
+          Path destPath = entry.absolutePath(mediator).getParent().resolve(FileUtils.fileNameWithoutExtension(entry.path()) + format.dottedExtension());
+          
+          Compressor<Compressible> compressor = new Compressor<>(new CompressorOptions(format, false, 9));
+          compressor.createArchive(destPath, Collections.singletonList(Compressible.ofPath(entry.absolutePath(mediator))));
+
+          //Files.delete(entry.path);
+          entry.setPath(entry.path().getParent().resolve(destPath.getFileName()));       
+        }
+        
+        return true;
+      }
+      catch (IOException ex)
+      {
+        throw new TaskException("Error while creating archive for "+entry.name(), ex);
+      }
+    };
+    
   }
   
   public static final EntryTask MakeEntryPathAbsolute = (mediator, entry) ->

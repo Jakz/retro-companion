@@ -1,22 +1,16 @@
 package com.github.jakz.retrocompanion.data;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.Optional;
-import java.util.Set;
-
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.ui.Mediator;
-import com.pixbits.lib.io.FileUtils;
-import com.pixbits.lib.io.FolderScanner;
+import com.pixbits.lib.io.archive.ArchiveFormat;
 
 public class Entry
 {
-  public Path path;
+  private Path path;
   private String name;
   private Optional<Core.Ref> core;
   Optional<DBRef> dbref;
@@ -33,6 +27,8 @@ public class Entry
     this.dbref  = dbref;
   }
   
+  public void setPath(Path path) { this.path = path; }
+  public Path path() { return path; }
   public Path absolutePath(Mediator mediator)
   { 
     if (path.isAbsolute())
@@ -40,6 +36,8 @@ public class Entry
     else //TOOD: always safe?
       return mediator.options().retroarchPath.resolve(path).normalize().toAbsolutePath();
   }
+  
+  public boolean isCompressed() { return ArchiveFormat.guessFormat(path) != null; }
     
   public void setPlayList(Playlist playlist) { this.playlist = playlist; }
   public Playlist playlist() { return playlist; }

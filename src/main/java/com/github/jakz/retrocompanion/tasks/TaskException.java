@@ -4,6 +4,13 @@ public class TaskException extends Exception
 {
   public final boolean shouldShowErrorDialog;
   public final String dialogMessage;
+  
+  public TaskException(String message)
+  {
+    super(message);
+    shouldShowErrorDialog = true;
+    this.dialogMessage = message;
+  }
 
   public TaskException(String message, Throwable cause)
   {
@@ -19,10 +26,10 @@ public class TaskException extends Exception
     this.dialogMessage = dialogMessage;
   }
   
-  public TaskException(String message, String dialogMessage)
+  public TaskException(String format, Object... args)
   {
-    super(message);
+    super(String.format(format, args));
     shouldShowErrorDialog = true;
-    this.dialogMessage = dialogMessage;
+    this.dialogMessage = getMessage();
   }
 }

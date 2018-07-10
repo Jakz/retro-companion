@@ -23,14 +23,11 @@ import javax.swing.JPopupMenu;
 import javax.swing.JToolBar;
 import javax.swing.filechooser.FileFilter;
 
-import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.CoreSet;
-import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.tasks.EntryTask;
 import com.github.jakz.retrocompanion.tasks.PlaylistTask;
-import com.github.jakz.retrocompanion.tasks.TaskException;
 import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.ui.UIUtils;
@@ -130,12 +127,12 @@ public class Toolbar extends JToolBar
     
     JButton removeTags = new JButton(Icon.REMOVE_TAGS.icon(ICON_SIZE));
     removeTags.setToolTipText("Remove tags from entry names"); //TODO: localize
-    removeTags.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.RemoveTagsFromName));
+    removeTags.addActionListener(e -> Tasks.executeEntryTaskOnPlaylistUI(mediator, EntryTask.RemoveTagsFromName));
     add(removeTags);
     
     JButton renameToFilename = new JButton(Icon.RENAME_TO_FILENAME.icon(ICON_SIZE));
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
-    renameToFilename.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.RenameEntryToMatchFileName));
+    renameToFilename.addActionListener(e -> Tasks.executeEntryTaskOnPlaylistUI(mediator, EntryTask.RenameEntryToMatchFileName));
     add(renameToFilename);
 
     JButton relativize = new JButton(Icon.RELATIVIZE.icon(ICON_SIZE));
@@ -185,7 +182,7 @@ public class Toolbar extends JToolBar
           .collect(Collectors.groupingBy(Core::systemName, () -> new TreeMap<>(), Collectors.toList()));
       
       JMenuItem detect = new JMenuItem("Auto-Detect"); //TODO: localize
-      detect.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.AssignCore(Optional.empty())));
+      detect.addActionListener(e -> Tasks.executeEntryTaskOnPlaylistUI(mediator, EntryTask.AssignCore(Optional.empty())));
       add(detect);
       
       coreBySystem.forEach((k, cores) -> {
@@ -195,7 +192,7 @@ public class Toolbar extends JToolBar
         for (Core core : cores)
         {
           JMenuItem coreItem = new JMenuItem(core.shortLibraryName());
-          coreItem.addActionListener(e -> Tasks.executeTaskUI(mediator, EntryTask.AssignCore(Optional.ofNullable(new Core.Ref(core)))));
+          coreItem.addActionListener(e -> Tasks.executeEntryTaskOnPlaylistUI(mediator, EntryTask.AssignCore(Optional.ofNullable(new Core.Ref(core)))));
           menu.add(coreItem);
         }
       });
