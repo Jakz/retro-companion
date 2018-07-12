@@ -234,7 +234,7 @@ public class Tasks
     }
     catch (TaskException e)
     {
-      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+      mediator.handleException(e);
     }
   }
   
@@ -246,7 +246,7 @@ public class Tasks
     }
     catch (TaskException e)
     {
-      UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
+      mediator.handleException(e);
     }
   }
   

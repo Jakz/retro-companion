@@ -55,6 +55,7 @@ class GridBagHolder
   public GridBagHolder lineStart() { return a(GridBagConstraints.LINE_START); }
   public GridBagHolder center() { return a(GridBagConstraints.CENTER); }
   
+  public GridBagHolder top() { return a(GridBagConstraints.LINE_START); }
   public GridBagHolder topLeft() { return a(GridBagConstraints.FIRST_LINE_START); }
   public GridBagHolder left() { return lineStart(); }
 

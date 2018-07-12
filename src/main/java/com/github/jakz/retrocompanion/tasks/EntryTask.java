@@ -77,7 +77,7 @@ public interface EntryTask
           
           Compressor<Compressible> compressor = new Compressor<>(new CompressorOptions(format, false, 9));
           compressor.createArchive(destPath, Collections.singletonList(Compressible.ofPath(entry.absolutePath(mediator))));
-
+          
           //Files.delete(entry.path);
           entry.setPath(entry.path().getParent().resolve(destPath.getFileName()));       
         }

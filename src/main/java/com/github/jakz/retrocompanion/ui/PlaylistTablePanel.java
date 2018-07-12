@@ -29,18 +29,25 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.TableCellRenderer;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.pixbits.lib.ui.elements.JPlaceHolderTextField;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
+import com.pixbits.lib.ui.table.FilterableDataSource;
 import com.pixbits.lib.ui.table.SimpleListSelectionListener;
 import com.pixbits.lib.ui.table.TableModel;
 import com.pixbits.lib.ui.table.editors.PathArgumentEditor;
+import com.pixbits.lib.ui.table.renderers.AlternateColorTableCellRenderer;
 import com.pixbits.lib.ui.table.renderers.DefaultTableAndListRenderer;
 
 public class PlaylistTablePanel extends JPanel
@@ -48,9 +55,11 @@ public class PlaylistTablePanel extends JPanel
   private final Mediator mediator;
   private final Options options;
   
-  private JTable table;
+  private PlaylistTable table;
   private Model model;
   private Playlist playlist;
+  
+  private JPlaceHolderTextField searchField;
   
   private final EntryPopupMenu entryPopupMenu;
   
@@ -60,15 +69,25 @@ public class PlaylistTablePanel extends JPanel
     this.mediator = mediator;
     this.options = mediator.options();
     
-    table = new JTable();
+    table = new PlaylistTable();
     model = new Model(table);
+    searchField = new JPlaceHolderTextField(20, "search");
     entryPopupMenu = new EntryPopupMenu(mediator);
+    
     
     JScrollPane tablePane = new JScrollPane(table);
     tablePane.setPreferredSize(new Dimension(800, 400));
     
     setLayout(new BorderLayout());
     add(tablePane, BorderLayout.CENTER);
+    add(searchField, BorderLayout.SOUTH);
+    
+    searchField.getDocument().addDocumentListener(new DocumentListener()
+    {
+      @Override public void insertUpdate(DocumentEvent e) { table.repaint(); }
+      @Override public void removeUpdate(DocumentEvent e) { table.repaint(); }
+      @Override public void changedUpdate(DocumentEvent e) { table.repaint(); }    
+    });
     
     try
     {
@@ -188,11 +207,53 @@ public class PlaylistTablePanel extends JPanel
       table.setDropMode(DropMode.INSERT_ROWS);
       table.setTransferHandler(new PlaylistTableTransferHandler(mediator, table, model));
       table.setFillsViewportHeight(true);
-      
     }
     catch (Exception e)
     {
       e.printStackTrace();
+    }
+  }
+  
+  private class PlaylistTable extends JTable
+  {
+    @Override public Component prepareRenderer(TableCellRenderer renderer, int r, int c)
+    {
+      JComponent component = (JComponent)super.prepareRenderer(renderer, r, c);
+
+      if (table.getColumnClass(c) == Boolean.class || table.getColumnClass(c) == Boolean.TYPE)
+        return component;
+      
+      String search = searchField.getText();
+      
+      if (!search.isEmpty())
+      {
+        Entry entry = model.data().get(convertRowIndexToModel(r));
+        
+        boolean matches = entry.name().toLowerCase().contains(search.toLowerCase());
+       
+        component.setForeground(matches ? Color.BLACK : Color.LIGHT_GRAY);
+        if (matches)
+        {
+          return component;
+        }
+      }
+      else
+        component.setForeground(Color.BLACK);
+      
+      /*
+      boolean isSelected = false;
+      for (int i : table.getSelectedRows())
+      {
+        if (i == r)
+        {
+          isSelected = true;
+          break;
+        }
+      }
+
+      AlternateColorTableCellRenderer.setBackgroundColor(component, isSelected, r);*/
+      
+      return component;
     }
   }
   

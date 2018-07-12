@@ -6,6 +6,7 @@ import java.util.List;
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
+import com.github.jakz.retrocompanion.tasks.TaskException;
 
 public interface Mediator
 {
@@ -31,4 +32,5 @@ public interface Mediator
   
   public Container modalTarget();
   public void showOptions();
+  public void handleException(TaskException exception);
 }

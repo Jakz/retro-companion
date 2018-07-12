@@ -8,12 +8,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.SwingUtilities;
+
 import com.github.jakz.retrocompanion.data.CoreSet;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.parsers.CoreParser;
+import com.github.jakz.retrocompanion.tasks.TaskException;
 import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.github.jakz.retrocompanion.ui.EntryInfoPanel;
+import com.github.jakz.retrocompanion.ui.ExceptionPanel;
 import com.github.jakz.retrocompanion.ui.MainPanel;
 import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.OptionsPanel;
@@ -67,6 +71,7 @@ public class Main
 
   private static WrapperFrame<MainPanel> mainFrame;
   private static WrapperFrame<OptionsPanel> optionsFrame;
+  private static WrapperFrame<ExceptionPanel> exceptionFrame;
   
   private static MainPanel mainPanel;
 
@@ -226,6 +231,22 @@ public class Main
       else
         optionsFrame.toFront();
     }
+    
+    @Override
+    public void handleException(TaskException exception)
+    {
+      if (exception.getCause() != null)
+      {
+        exceptionFrame.setLocationRelativeTo(mainFrame);
+        SwingUtilities.invokeLater(() -> {
+          exceptionFrame.panel().exceptionThrown(exception);
+          exceptionFrame.setVisible(true);
+        });
+      }
+      else
+        UIUtils.showErrorDialog(modalTarget(), "Error", exception.dialogMessage);
+    }
+    
   }
   
   public static void main(String[] args)
@@ -267,6 +288,8 @@ public class Main
       mainFrame.exitOnClose();
       mainFrame.centerOnScreen();
       mainFrame.setVisible(true);
+      
+      exceptionFrame = UIUtils.buildFrame(new ExceptionPanel(), "Error");
       
       mediator.scanAndLoadPlaylists();
       if (!playlists.isEmpty())
