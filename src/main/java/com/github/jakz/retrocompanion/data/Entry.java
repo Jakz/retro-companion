@@ -66,7 +66,7 @@ public class Entry
       for (ThumbnailType tt : ThumbnailType.values())
       {
         Path oldPath = options.pathForThumbnail(playlist, tt, this);
-        Path newPath = oldPath.getParent().resolve(name+".png");
+        Path newPath = options.pathForThumbnail(playlist, tt, name());
         
         if (Files.exists(oldPath))
           Files.move(oldPath, newPath);

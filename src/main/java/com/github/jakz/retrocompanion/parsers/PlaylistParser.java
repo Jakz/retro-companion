@@ -60,7 +60,12 @@ public class PlaylistParser
       Core core = cores.forPath(corePath);
       
       if (core == null)
+      {
+        if (options.ignoreUnknownCores)
+          return null;
+        
         throw new ParseException("Unknown core for entry: %s", corePath);
+      }
       
       return new Core.Ref(core, entry.coreName);
     }));

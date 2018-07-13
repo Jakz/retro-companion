@@ -28,7 +28,7 @@ public class Tasks
       OperatingSystem os = UIUtils.getOperatingSystem();
       String executableName = os.isWindows() ? "retroarch.exe" : "retroarch";
       Path executablePath = mediator.options().retroarchPath.resolve(executableName);   
-      Runtime.getRuntime().exec(executablePath.toString());
+      Runtime.getRuntime().exec(executablePath.toString());//, null, executablePath.getParent().toFile());
       return true;
     }
     catch (Exception e)

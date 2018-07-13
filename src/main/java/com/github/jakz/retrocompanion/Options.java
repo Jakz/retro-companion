@@ -36,6 +36,7 @@ public class Options
   public boolean showConfirmationDialogForUndoableOperations;
   public boolean autoRelativizePathsWhenImporting;
   public boolean skipImportingDuplicates;
+  public boolean ignoreUnknownCores;
   
   /* TODO: we're passing it here but maybe there's a better place */
   public transient CoreSet cores;
@@ -51,6 +52,7 @@ public class Options
     showConfirmationDialogForUndoableOperations = true;
     autoRelativizePathsWhenImporting = true;
     skipImportingDuplicates = true;
+    ignoreUnknownCores = true;
   }
   
   public void derivePathsFromRetroarch()
@@ -80,10 +82,15 @@ public class Options
   
   public Path pathForThumbnail(Playlist playlist, ThumbnailType type, Entry game)
   {
+    return pathForThumbnail(playlist, type, game.name());
+  }
+  
+  public Path pathForThumbnail(Playlist playlist, ThumbnailType type, String game)
+  {
     return thumbnailsPath
       .resolve(playlist.name())
       .resolve(type.folderName)
-      .resolve(game.name().replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
+      .resolve(game.replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_") + ".png");
   }
   
   public Path[] pathsForPlaylistIcon(String playlistName)
