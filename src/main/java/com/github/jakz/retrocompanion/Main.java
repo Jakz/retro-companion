@@ -27,6 +27,9 @@ import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.WrapperFrame;
 import com.pixbits.lib.util.ShutdownManager;
 
+import net.sf.sevenzipjbinding.SevenZip;
+import net.sf.sevenzipjbinding.SevenZipNativeInitializationException;
+
 public class Main 
 {  
   public static final Path OPTIONS_PATH = Paths.get("options.json");
@@ -60,6 +63,19 @@ public class Main
       options.save(OPTIONS_PATH);
     }
     catch (IOException e)
+    {
+      e.printStackTrace();
+    }
+  }
+  
+  public static void initZipLibrary()
+  {
+    try
+    {
+      if (!SevenZip.isInitializedSuccessfully())
+        SevenZip.initSevenZipFromPlatformJAR();
+    } 
+    catch (SevenZipNativeInitializationException e)
     {
       e.printStackTrace();
     }

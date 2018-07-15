@@ -40,6 +40,7 @@ import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
+import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.ui.elements.JPlaceHolderTextField;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
@@ -145,6 +146,13 @@ public class PlaylistTablePanel extends JPanel
           return field;
         }
       });
+      
+      ColumnSpec<Entry, String> formatColumn = new ColumnSpec<Entry, String>("F", String.class, (e -> {
+        String ext = FileUtils.pathExtension(e.path()).toLowerCase();
+        return ext;
+      }));
+      formatColumn.setWidth(60);
+      model.addColumn(formatColumn);
              
       //e.core().map(Core.Ref::shortLibraryName).orElse("DETECT")
       Function<Entry, Optional<Core.Ref>> getter = e -> e.core();
@@ -224,10 +232,10 @@ public class PlaylistTablePanel extends JPanel
         return component;
       
       String search = searchField.getText();
+      Entry entry = model.data().get(convertRowIndexToModel(r));
       
       if (!search.isEmpty())
       {
-        Entry entry = model.data().get(convertRowIndexToModel(r));
         
         boolean matches = entry.name().toLowerCase().contains(search.toLowerCase());
        
@@ -239,6 +247,9 @@ public class PlaylistTablePanel extends JPanel
       }
       else
         component.setForeground(Color.BLACK);
+      
+      if (!Files.exists(entry.absolutePath(mediator)))
+        component.setForeground(Color.RED);
       
       /*
       boolean isSelected = false;

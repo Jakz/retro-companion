@@ -57,7 +57,7 @@ public class Entry
       } 
       catch (IOException e)
       {
-        e.printStackTrace();
+        /*TODO: silent? e.printStackTrace(); */
         sizeInBytes = 0;
       }
     }

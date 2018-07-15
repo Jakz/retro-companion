@@ -35,6 +35,7 @@ public class EntryPopupMenu extends JPopupMenu
     compressMenu.add(to7Z);
     
     uncompress = new JMenuItem("Uncompress");
+    uncompress.addActionListener(e -> Tasks.executeTaskOnEntryUI(mediator, EntryTask.UncompressEntry, entry));
     
     openInExplorer = new JMenuItem("Open in file explorer");
     openInExplorer.addActionListener(e -> Tasks.executeTaskUI(mediator, Tasks.OpenFileInExplorer(() -> entry.absolutePath(mediator))));

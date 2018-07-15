@@ -32,7 +32,7 @@ public class ExceptionPanel extends JPanel
     add(icon, c.g(0, 0).leftInsets(10).w(1).c());
     
     title = new JLabel();
-    add(title, c.g(1, 0).noInsets().w(4).c());
+    add(title, c.g(1, 0).left().noInsets().w(4).c());
     
     area = new JTextArea(10,60);
     area.setFont(new Font("consolas", Font.PLAIN, 12));
@@ -47,11 +47,16 @@ public class ExceptionPanel extends JPanel
     title.setText(exception.dialogMessage);
     
     Throwable throwable = exception.getCause();   
-    StackTraceElement[] stack = throwable.getStackTrace();
     
     StringBuilder text = new StringBuilder();
     
-    text.append(throwable.getMessage()).append("\n");
+    text.append(throwable.toString()).append("\n");
+    
+    throwable = throwable.getCause();
+    if (throwable != null)
+      text.append("Caused by ").append(throwable.toString()).append("\n");
+    
+    StackTraceElement[] stack = throwable.getStackTrace();
     for (StackTraceElement element : stack)
       text.append("  ").append(element.toString()).append("\n");
     

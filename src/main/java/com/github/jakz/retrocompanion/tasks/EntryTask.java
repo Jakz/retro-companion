@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.Optional;
 
+import com.github.jakz.retrocompanion.Main;
 import com.github.jakz.retrocompanion.data.Core;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.ui.Mediator;
@@ -14,6 +15,8 @@ import com.pixbits.lib.io.archive.ArchiveFormat;
 import com.pixbits.lib.io.archive.Compressible;
 import com.pixbits.lib.io.archive.Compressor;
 import com.pixbits.lib.io.archive.CompressorOptions;
+import com.pixbits.lib.io.archive.support.Archive;
+import com.pixbits.lib.io.archive.support.Archive.Item;
 
 @FunctionalInterface
 public interface EntryTask
@@ -78,7 +81,7 @@ public interface EntryTask
           Compressor<Compressible> compressor = new Compressor<>(new CompressorOptions(format, false, 9));
           compressor.createArchive(destPath, Collections.singletonList(Compressible.ofPath(entry.absolutePath(mediator))));
           
-          //Files.delete(entry.path);
+          //Files.delete(entry.absolutePath(mediator));
           entry.setPath(entry.path().getParent().resolve(destPath.getFileName()));       
         }
         
@@ -89,8 +92,32 @@ public interface EntryTask
         throw new TaskException("Error while creating archive for "+entry.name(), ex);
       }
     };
-    
   }
+  
+  public static final EntryTask UncompressEntry = (mediator, entry) -> {
+    try
+    {      
+      Archive archive = new Archive(entry.absolutePath(mediator), true);
+      //TODO: archive has more than 1 file, this probably shouldn't be extracted?
+      if (archive.size() > 1)
+        throw new TaskException("Error while extracting archive for"+entry.name()+": entry has more than one file in the archive");
+      
+      Item item = archive.itemAt(0);
+      Path destPath = entry.absolutePath(mediator).getParent().resolve(item.path);     
+      
+      archive.extract(item, destPath);
+      
+      //Files.delete(entry.absolutePath(mediator));
+      entry.setPath(entry.path().getParent().resolve(item.path));
+      
+      archive.close();
+    }
+    catch (IOException ex)
+    {
+      throw new TaskException("Error while extracting archive for "+entry.name(), ex);
+    }
+    return true;
+  };
   
   public static final EntryTask MakeEntryPathAbsolute = (mediator, entry) ->
   {
