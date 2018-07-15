@@ -8,6 +8,7 @@ import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.ImagingOpException;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,9 +22,12 @@ import javax.swing.JLabel;
 
 import org.imgscalr.Scalr;
 
+import com.pixbits.lib.lang.Size;
+
 public class ThumbnailBox extends JLabel
 {
   private final int size;
+  private Size.Int originalSize;
   private final int margin;
  
   private boolean showSize;
@@ -55,7 +59,11 @@ public class ThumbnailBox extends JLabel
     try 
     {
       if (Files.exists(path))
-        setIcon(new ImageIcon(Scalr.resize(ImageIO.read(path.toFile()), size)));
+      {
+        BufferedImage image = ImageIO.read(path.toFile());
+        originalSize = new Size.Int(image.getWidth(), image.getHeight());
+        setIcon(new ImageIcon(Scalr.resize(image, size)));
+      }
       else
         clearImage();
       
@@ -103,7 +111,7 @@ public class ThumbnailBox extends JLabel
     
     if (showSize && icon != null)
     {
-      String sizeString = String.format("%d x %d", icon.getIconWidth(), icon.getIconHeight());
+      String sizeString = String.format("%d x %d", originalSize.w, originalSize.h);
       
       Rectangle2D sb = fm.getStringBounds(sizeString, g);
       

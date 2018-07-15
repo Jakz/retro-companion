@@ -88,20 +88,30 @@ public class Main
       {
         List<Playlist> playlists = Tasks.Standalone.loadPlaylistsFromFolder(options().playlistsPath, options);
         playlists.sort((p1, p2) -> p1.path().compareTo(p2.path()));
+        playlists.forEach(p -> p.cacheSize(this));
         
         Main.playlists.clear();
         Main.playlists.addAll(playlists);
+        
         mainPanel.playlistChooser.removeAllItems();
         Main.playlists.forEach(mainPanel.playlistChooser::addItem);
+        mainPanel.toolbar.updateSummaryLabel(this);
       }
     }
     
     @Override
     public void refreshPlaylistMetadata()
     {
+      playlist().cacheSize(this);
       playlistInfoPanel.refresh();
       mainPanel.playlistChooser.repaint();
-
+      mainPanel.toolbar.updateSummaryLabel(this);
+    }
+    
+    @Override
+    public void repaintPlaylistTable()
+    {
+      playlistPanel.repaint();
     }
     
     @Override
@@ -110,6 +120,7 @@ public class Main
       playlistPanel.refresh();
       entryInfoPanel.setEntry(null);
       refreshPlaylistMetadata();
+      mainPanel.toolbar.updateSummaryLabel(this);
     }
     
     @Override
@@ -120,6 +131,8 @@ public class Main
       
       mainPanel.playlistChooser.removeAllItems();
       Main.playlists.forEach(mainPanel.playlistChooser::addItem);
+      mainPanel.toolbar.updateSummaryLabel(this);
+
     }
     
     @Override
@@ -134,6 +147,8 @@ public class Main
       
       if (wasSelected && mainPanel.playlistChooser.getItemCount() > 0)
         mainPanel.playlistChooser.setSelectedIndex(index);
+      
+      mainPanel.toolbar.updateSummaryLabel(this);
     }
     
     

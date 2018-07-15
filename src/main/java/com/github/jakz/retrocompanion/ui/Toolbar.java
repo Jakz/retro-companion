@@ -16,6 +16,7 @@ import java.util.stream.Collectors;
 import javax.swing.Box;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
@@ -30,6 +31,7 @@ import com.github.jakz.retrocompanion.tasks.EntryTask;
 import com.github.jakz.retrocompanion.tasks.PlaylistTask;
 import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.lang.StringUtils;
 import com.pixbits.lib.ui.UIUtils;
 
 public class Toolbar extends JToolBar 
@@ -39,9 +41,13 @@ public class Toolbar extends JToolBar
 
   private final int ICON_SIZE = 32;
   
+  private JLabel summaryLabel;
+  
   public Toolbar(Mediator mediator)
   {
     this.mediator = mediator;
+    
+    summaryLabel = new JLabel();
     
     JButton newPlaylist = new JButton(Icon.NEW_PLAYLIST.icon(ICON_SIZE));
     newPlaylist.setToolTipText("New playlist"); //TODO: localize
@@ -159,6 +165,10 @@ public class Toolbar extends JToolBar
     
     add(setCore);
     
+    addSeparator();
+    
+    add(summaryLabel);
+    
     add(Box.createHorizontalGlue());
     
     JButton launchRetroarch = new JButton(Icon.RETROARCH.icon(ICON_SIZE));
@@ -172,6 +182,21 @@ public class Toolbar extends JToolBar
     add(options);
   
     setFloatable(false);
+  }
+  
+  public void updateSummaryLabel(Mediator mediator)
+  {
+    int playlistCount = mediator.playlists().size();
+    int entriesCount = 0;
+    long totalSizeInBytes = 0;
+    
+    for (Playlist playlist : mediator.playlists())
+    {
+      entriesCount += playlist.size();
+      totalSizeInBytes += playlist.sizeInBytes();
+    }
+    
+    summaryLabel.setText(String.format("%d entries in %d playlists (%s)", entriesCount, playlistCount, StringUtils.humanReadableByteCount(totalSizeInBytes, true, true)));
   }
   
   private class CoreSelectMenu extends JPopupMenu

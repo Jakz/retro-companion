@@ -76,7 +76,7 @@ public class EntryInfoPanel extends JPanel
           mediator,
           files -> entry != null && files.length == 1,
           () -> pathForThumbnail(type), 
-          () -> setEntry(entry)
+          () -> { setEntry(entry); mediator.repaintPlaylistTable(); }
       )));
       
       thumbnails[i].addMouseListener(new MouseAdapter() {

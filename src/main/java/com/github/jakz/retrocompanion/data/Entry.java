@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.util.Optional;
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.ui.Mediator;
+import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.archive.ArchiveFormat;
 
 public class Entry
@@ -16,6 +17,8 @@ public class Entry
   Optional<DBRef> dbref;
   Playlist playlist;
   
+  private long sizeInBytes;
+  
   public Entry(Playlist playlist, Path path, String name, Optional<Core.Ref> core, Optional<DBRef> dbref)
   {
     this.playlist = playlist;
@@ -25,6 +28,8 @@ public class Entry
     
     this.core = core;
     this.dbref  = dbref;
+    
+    this.sizeInBytes = -1;
   }
   
   public void setPath(Path path) { this.path = path; }
@@ -35,6 +40,29 @@ public class Entry
       return path;
     else //TOOD: always safe?
       return mediator.options().retroarchPath.resolve(path).normalize().toAbsolutePath();
+  }
+  
+  public long sizeInBytes(Mediator mediator)
+  {
+    if (sizeInBytes == -1)
+    {
+      try 
+      {
+        Path path = absolutePath(mediator);
+        
+        if (FileUtils.pathExtension(path).equals("scummvm"))
+          sizeInBytes += FileUtils.folderSize(path.getParent(), true, false);
+        else
+          sizeInBytes = Files.size(path);  
+      } 
+      catch (IOException e)
+      {
+        e.printStackTrace();
+        sizeInBytes = 0;
+      }
+    }
+    
+    return sizeInBytes;
   }
   
   public boolean isCompressed() { return ArchiveFormat.guessFormat(path) != null; }

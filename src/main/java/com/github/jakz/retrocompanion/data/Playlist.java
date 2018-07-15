@@ -9,7 +9,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.github.jakz.retrocompanion.ui.Mediator;
 import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.lang.StringUtils;
 import com.pixbits.lib.ui.table.ModifiableDataSource;
 
 public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
@@ -17,22 +19,34 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
   private Path path;
   private final List<Entry> entries;
   
+  private long sizeInBytes;
   public boolean dirty;
   
   public Playlist(Path path)
   {
     this.path = path;
-    entries = new ArrayList<>();
+    this.sizeInBytes = -1;
+    this.entries = new ArrayList<>();
   }
   
   public String toString()
   {
-    return path.getFileName().toString() + " (" + entries.size() + ")" + (dirty ? " *" : "");
+    return String.format("%s (%d) (%s)", nameWithExtension(), entries.size(), StringUtils.humanReadableByteCount(sizeInBytes(), true, true));   
   }
   
   public void markDirty() 
   {
     dirty = true;
+  }
+  
+  public void cacheSize(Mediator mediator)
+  {
+    sizeInBytes = entries.stream().mapToLong(e -> e.sizeInBytes(mediator)).sum();
+  }
+  
+  public long sizeInBytes()
+  {
+    return sizeInBytes;
   }
   
   public void add(Entry entry)

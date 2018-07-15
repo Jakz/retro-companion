@@ -13,6 +13,7 @@ public interface Mediator
   public void scanAndLoadPlaylists();  
   public void refreshPlaylist();
   public void refreshPlaylistMetadata();
+  public void repaintPlaylistTable();
   public void addPlaylist(Playlist playlist);
   public void removePlaylist(Playlist playlist);
   public void selectPlaylist(Playlist playlist);
