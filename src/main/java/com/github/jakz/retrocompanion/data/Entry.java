@@ -4,13 +4,18 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
+import java.util.function.Function;
+
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.ui.Mediator;
+import com.github.jakz.romlib.formats.PlaylistM3U;
+import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.archive.ArchiveFormat;
 
 public class Entry
 {
+  private Path absolutePath;
   private Path path;
   private String name;
   private Optional<Core.Ref> core;
@@ -42,6 +47,12 @@ public class Entry
       return mediator.options().retroarchPath.resolve(path).normalize().toAbsolutePath();
   }
   
+  public void markSizeDirty()
+  { 
+    sizeInBytes = -1; 
+    playlist.markSizeDirty();
+  }
+  
   public long sizeInBytes(Mediator mediator)
   {
     if (sizeInBytes == -1)
@@ -52,11 +63,20 @@ public class Entry
         
         if (FileUtils.pathExtension(path).equals("scummvm"))
           sizeInBytes += FileUtils.folderSize(path.getParent(), true, false);
+        else if (FileUtils.pathExtension(path).equals("m3u"))
+        {
+          PlaylistM3U playlist = new PlaylistM3U(path);
+          sizeInBytes = playlist.stream()
+            .map(StreamException.rethrowFunction(Files::size))
+            .mapToLong(i -> i)
+            .sum();
+        }
         else
           sizeInBytes = Files.size(path);  
       } 
       catch (IOException e)
       {
+        e.printStackTrace();
         /*TODO: silent? e.printStackTrace(); */
         sizeInBytes = 0;
       }

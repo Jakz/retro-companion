@@ -193,7 +193,7 @@ public class Toolbar extends JToolBar
     for (Playlist playlist : mediator.playlists())
     {
       entriesCount += playlist.size();
-      totalSizeInBytes += playlist.sizeInBytes();
+      totalSizeInBytes += playlist.sizeInBytes(mediator);
     }
     
     summaryLabel.setText(String.format("%d entries in %d playlists (%s)", entriesCount, playlistCount, StringUtils.humanReadableByteCount(totalSizeInBytes, true, true)));

@@ -83,6 +83,7 @@ public interface EntryTask
           
           //Files.delete(entry.absolutePath(mediator));
           entry.setPath(entry.path().getParent().resolve(destPath.getFileName()));       
+          entry.markSizeDirty();
         }
         
         return true;
@@ -109,6 +110,7 @@ public interface EntryTask
       
       //Files.delete(entry.absolutePath(mediator));
       entry.setPath(entry.path().getParent().resolve(item.path));
+      entry.markSizeDirty();
       
       archive.close();
     }

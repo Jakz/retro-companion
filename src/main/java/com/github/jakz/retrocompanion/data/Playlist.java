@@ -31,7 +31,7 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
   
   public String toString()
   {
-    return String.format("%s (%d) (%s)", nameWithExtension(), entries.size(), StringUtils.humanReadableByteCount(sizeInBytes(), true, true));   
+    return String.format("%s (%d) (%s)", nameWithExtension(), entries.size(), StringUtils.humanReadableByteCount(sizeInBytes(null), true, true));   
   }
   
   public void markDirty() 
@@ -39,13 +39,26 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     dirty = true;
   }
   
+  public void markSizeDirty()
+  {
+    sizeInBytes = -1;
+  }
+  
   public void cacheSize(Mediator mediator)
   {
     sizeInBytes = entries.stream().mapToLong(e -> e.sizeInBytes(mediator)).sum();
   }
   
-  public long sizeInBytes()
+  public long sizeInBytes(Mediator mediator)
   {
+    if (sizeInBytes == -1)
+    {
+      if (mediator != null)
+        cacheSize(mediator);
+      else
+        sizeInBytes = 0;
+    }
+    
     return sizeInBytes;
   }
   

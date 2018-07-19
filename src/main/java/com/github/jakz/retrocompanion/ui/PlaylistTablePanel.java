@@ -41,6 +41,7 @@ import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.data.ThumbnailType;
 import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.lang.StringUtils;
 import com.pixbits.lib.ui.elements.JPlaceHolderTextField;
 import com.pixbits.lib.ui.table.ColumnSpec;
 import com.pixbits.lib.ui.table.DataSource;
@@ -153,7 +154,11 @@ public class PlaylistTablePanel extends JPanel
       }));
       formatColumn.setWidth(60);
       model.addColumn(formatColumn);
-             
+      
+      ColumnSpec<Entry, String> sizeColumn = new ColumnSpec<>("S", String.class, e -> StringUtils.humanReadableByteCount(e.sizeInBytes(mediator)));
+      sizeColumn.setWidth(80);
+      model.addColumn(sizeColumn);
+      
       //e.core().map(Core.Ref::shortLibraryName).orElse("DETECT")
       Function<Entry, Optional<Core.Ref>> getter = e -> e.core();
       BiConsumer<Entry, Optional<Core.Ref>> setter = (e,v) -> e.setCore(v.map(Core.Ref::dupe));

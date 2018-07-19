@@ -7,6 +7,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.SwingUtilities;
 
@@ -188,6 +189,9 @@ public class Main
       mainPanel.playlistChooser.repaint();
       entryInfoPanel.setEntry(null);
       playlistInfoPanel.setPlaylist(playlist);
+      
+      if (playlist != null)
+        options.lastSelectedPlaylist = playlist.path();
     }
     
     @Override
@@ -322,9 +326,17 @@ public class Main
       
       exceptionFrame = UIUtils.buildFrame(new ExceptionPanel(), "Error");
       
+      Path lastSelectedPlaylist = options.lastSelectedPlaylist;
       mediator.scanAndLoadPlaylists();
+      
       if (!playlists.isEmpty())
-        mediator.selectPlaylist(playlists.get(0));
+      {
+        Optional<Playlist> playlist = playlists.stream()
+          .filter(p -> p.path().equals(lastSelectedPlaylist))
+          .findFirst();
+        
+        mediator.selectPlaylist(playlist.orElse(playlists.get(0)));      
+      }
     } 
     catch (IOException e)
     {

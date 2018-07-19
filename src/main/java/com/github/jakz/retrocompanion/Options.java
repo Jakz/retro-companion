@@ -37,6 +37,9 @@ public class Options
   public boolean autoRelativizePathsWhenImporting;
   public boolean skipImportingDuplicates;
   public boolean ignoreUnknownCores;
+  public boolean calculateSizes;
+  
+  public Path lastSelectedPlaylist;
   
   /* TODO: we're passing it here but maybe there's a better place */
   public transient CoreSet cores;
@@ -53,6 +56,9 @@ public class Options
     autoRelativizePathsWhenImporting = true;
     skipImportingDuplicates = true;
     ignoreUnknownCores = true;
+    calculateSizes = false;
+    
+    lastSelectedPlaylist = null;
   }
   
   public void derivePathsFromRetroarch()
