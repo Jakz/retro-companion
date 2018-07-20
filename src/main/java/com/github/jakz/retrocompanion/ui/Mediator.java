@@ -7,6 +7,7 @@ import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Entry;
 import com.github.jakz.retrocompanion.data.Playlist;
 import com.github.jakz.retrocompanion.tasks.TaskException;
+import com.pixbits.lib.ui.elements.ProgressDialog;
 
 public interface Mediator
 {
@@ -33,5 +34,6 @@ public interface Mediator
   
   public Container modalTarget();
   public void showOptions();
+  public ProgressDialog.Manager progress();
   public void handleException(TaskException exception);
 }

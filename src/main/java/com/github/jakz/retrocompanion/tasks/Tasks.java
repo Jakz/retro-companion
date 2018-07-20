@@ -8,8 +8,11 @@ import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+
+import javax.swing.SwingUtilities;
 
 import com.github.jakz.retrocompanion.Options;
 import com.github.jakz.retrocompanion.data.Entry;
@@ -19,6 +22,7 @@ import com.github.jakz.retrocompanion.ui.Mediator;
 import com.pixbits.lib.io.FolderScanner;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.UIUtils.OperatingSystem;
+import com.pixbits.lib.ui.elements.ProgressDialog;
 
 public class Tasks
 {
@@ -220,7 +224,7 @@ public class Tasks
     
     return false;
   }
-  
+    
   public static void executeEntryTaskOnPlaylistUI(Mediator mediator, EntryTask task)
   {
     executeTaskUI(mediator, PlaylistTask.of(task));
@@ -261,5 +265,45 @@ public class Tasks
     {
       UIUtils.showErrorDialog(mediator.modalTarget(), "Error", e.dialogMessage);
     }
+  }
+  
+  public static void executeLongEntryTaskOnPlaylist(Mediator mediator, EntryTask task, String title, String progressFormat)
+  {
+    ProgressDialog.Manager progress = mediator.progress();
+    
+    AtomicBoolean canceled = new AtomicBoolean();
+    Runnable onCancel = () -> canceled.set(true);
+    
+    progress.show(title, onCancel);
+    
+    Runnable threadTask = () -> {
+      Playlist playlist = mediator.playlist();
+      
+      try
+      {   
+        final float total = playlist.size();
+        
+        for (int i = 0; i < total; ++i)
+        {
+          Entry entry = playlist.get(i);
+          
+          if (canceled.get())
+            return;
+          
+          final float percent = i / total;
+          SwingUtilities.invokeLater(() -> progress.update(percent, String.format(progressFormat, entry.name())));
+          task.process(mediator, entry);
+        }  
+        
+        SwingUtilities.invokeLater(() -> progress.finished());
+      }
+      catch (TaskException e)
+      {
+        SwingUtilities.invokeLater(() ->
+          mediator.handleException(e));
+      }
+    };
+    
+    new Thread(threadTask).start();
   }
 }

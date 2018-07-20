@@ -14,11 +14,10 @@ public enum Icon
   ADD_ENTRY("add_entry"),
   
   SORT_AZ("sort_az"),
-  RELATIVIZE("relativize"),
-  MAKE_ABSOLUTE("make_absolute"),
   REMOVE_TAGS("remove_tags"),
   RENAME_TO_FILENAME("rename_to_filename"),
   SET_CORE("set_core"),
+  COMPRESS("compress"),
   
   SAVE("save"),
   NEW_PLAYLIST("new"),

@@ -98,26 +98,30 @@ public interface EntryTask
   public static final EntryTask UncompressEntry = (mediator, entry) -> {
     try
     {      
-      Archive archive = new Archive(entry.path(), true);
-      //TODO: archive has more than 1 file, this probably shouldn't be extracted?
-      if (archive.size() > 1)
-        throw new TaskException("Error while extracting archive for"+entry.name()+": entry has more than one file in the archive");
-      
-      Item item = archive.itemAt(0);
-      Path destPath = entry.path().getParent().resolve(item.path);     
-      
-      archive.extract(item, destPath);
-      
-      //Files.delete(entry.absolutePath(mediator));
-      entry.setPath(destPath);
-      entry.markSizeDirty();
-      
-      archive.close();
+      if (entry.isCompressed())
+      {
+        Archive archive = new Archive(entry.path(), true);
+        //TODO: archive has more than 1 file, this probably shouldn't be extracted?
+        if (archive.size() > 1)
+          throw new TaskException("Error while extracting archive for"+entry.name()+": entry has more than one file in the archive");
+        
+        Item item = archive.itemAt(0);
+        Path destPath = entry.path().getParent().resolve(item.path);     
+        
+        archive.extract(item, destPath);
+        
+        //Files.delete(entry.absolutePath(mediator));
+        entry.setPath(destPath);
+        entry.markSizeDirty();
+        
+        archive.close();
+      }
     }
     catch (IOException ex)
     {
       throw new TaskException("Error while extracting archive for "+entry.name(), ex);
     }
+    
     return true;
   };
   

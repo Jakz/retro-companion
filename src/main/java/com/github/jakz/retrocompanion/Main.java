@@ -24,8 +24,10 @@ import com.github.jakz.retrocompanion.ui.Mediator;
 import com.github.jakz.retrocompanion.ui.OptionsPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistInfoPanel;
 import com.github.jakz.retrocompanion.ui.PlaylistTablePanel;
+import com.pixbits.lib.log.ProgressLogger;
 import com.pixbits.lib.ui.UIUtils;
 import com.pixbits.lib.ui.WrapperFrame;
+import com.pixbits.lib.ui.elements.ProgressDialog;
 import com.pixbits.lib.util.ShutdownManager;
 
 import net.sf.sevenzipjbinding.SevenZip;
@@ -95,6 +97,8 @@ public class Main
   private static EntryInfoPanel entryInfoPanel;
   private static PlaylistTablePanel playlistPanel;
   private static PlaylistInfoPanel playlistInfoPanel;
+  
+  private static ProgressDialog.Manager progress;
   
   private static class MyMediator implements Mediator
   {
@@ -254,6 +258,12 @@ public class Main
     }
     
     @Override
+    public ProgressDialog.Manager progress()
+    {
+      return progress;
+    }
+    
+    @Override
     public void showOptions()
     {
       optionsFrame.setLocationRelativeTo(mainFrame);
@@ -323,6 +333,8 @@ public class Main
       mainFrame.exitOnClose();
       mainFrame.centerOnScreen();
       mainFrame.setVisible(true);
+      
+      progress = new ProgressDialog.Manager(mainFrame);
       
       exceptionFrame = UIUtils.buildFrame(new ExceptionPanel(), "Error");
       

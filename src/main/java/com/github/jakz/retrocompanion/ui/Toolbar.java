@@ -31,6 +31,7 @@ import com.github.jakz.retrocompanion.tasks.EntryTask;
 import com.github.jakz.retrocompanion.tasks.PlaylistTask;
 import com.github.jakz.retrocompanion.tasks.Tasks;
 import com.pixbits.lib.io.FileUtils;
+import com.pixbits.lib.io.archive.ArchiveFormat;
 import com.pixbits.lib.lang.StringUtils;
 import com.pixbits.lib.ui.UIUtils;
 
@@ -42,6 +43,8 @@ public class Toolbar extends JToolBar
   private final int ICON_SIZE = 32;
   
   private JLabel summaryLabel;
+  
+  private JPopupMenu compressionMenu;
   
   public Toolbar(Mediator mediator)
   {
@@ -140,16 +143,6 @@ public class Toolbar extends JToolBar
     renameToFilename.setToolTipText("Rename all entries to match their filename"); //TODO: localize
     renameToFilename.addActionListener(e -> Tasks.executeEntryTaskOnPlaylistUI(mediator, EntryTask.RenameEntryToMatchFileName));
     add(renameToFilename);
-
-    JButton relativize = new JButton(Icon.RELATIVIZE.icon(ICON_SIZE));
-    relativize.setToolTipText(Strings.HELP_RELATIVIZE_TO_RETROARCH.text());
-    relativize.addActionListener(e -> Tasks.relativizePathsToRetroarch(mediator));
-    add(relativize);
-    
-    JButton makeAbsolute = new JButton(Icon.MAKE_ABSOLUTE.icon(ICON_SIZE));
-    makeAbsolute.setToolTipText(Strings.HELP_MAKE_ABSOLUTE_PATHS.text());
-    makeAbsolute.addActionListener(e -> Tasks.makePathsAbsolute(mediator));
-    add(makeAbsolute);
     
     JButton setCore = new JButton(Icon.SET_CORE.icon(ICON_SIZE));
     setCore.setToolTipText("Set same core for all entries");
@@ -164,6 +157,34 @@ public class Toolbar extends JToolBar
     });
     
     add(setCore);
+    
+    /* compression button and menu */
+    {
+      compressionMenu = new JPopupMenu();
+      JMenuItem uncompress = new JMenuItem("Uncompress");
+      JMenuItem compressToZip = new JMenuItem("Compress to ZIP");
+
+      JMenuItem compressTo7z = new JMenuItem("Compress to 7Z");
+      
+      uncompress.addActionListener(e -> Tasks.executeLongEntryTaskOnPlaylist(mediator, EntryTask.UncompressEntry, "Uncompressing playlist..", "Uncompressing %s"));
+      compressToZip.addActionListener(e -> Tasks.executeLongEntryTaskOnPlaylist(mediator, EntryTask.CompressEntry(ArchiveFormat.ZIP), "Compressing playlist..", "Compressing %s"));
+      compressTo7z.addActionListener(e -> Tasks.executeLongEntryTaskOnPlaylist(mediator, EntryTask.CompressEntry(ArchiveFormat._7ZIP), "Compressing playlist..", "Compressing %s"));
+
+      compressionMenu.add(uncompress);
+      compressionMenu.addSeparator();
+      compressionMenu.add(compressToZip);
+      compressionMenu.add(compressTo7z);
+    }
+    
+    JButton compressPlaylist = new JButton(Icon.COMPRESS.icon(ICON_SIZE));
+    compressPlaylist.setToolTipText("Manage entry compression");
+    compressPlaylist.addMouseListener(new MouseAdapter() {
+      @Override public void mousePressed(MouseEvent e) {
+        compressionMenu.show(e.getComponent(), e.getX(), e.getY());
+      }
+    });
+    
+    add(compressPlaylist);
     
     addSeparator();
     
