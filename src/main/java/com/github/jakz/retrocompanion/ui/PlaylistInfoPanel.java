@@ -97,7 +97,10 @@ public class PlaylistInfoPanel extends JPanel
     add(icons[0], c.g(1, 1).c());
     add(icons[1], c.g(2, 1).c());
     
-    nameField.addActionListener(e -> Tasks.executeTaskUI(mediator, PlaylistTask.RenamePlaylist(nameField.getText())));
+    nameField.addActionListener(e -> {
+      Tasks.executeTaskUI(mediator, PlaylistTask.RenamePlaylist(nameField.getText()));
+      mediator.refreshPlaylistMetadata(); 
+    });
   }
   
   public void setPlaylist(Playlist playlist)
@@ -134,7 +137,6 @@ public class PlaylistInfoPanel extends JPanel
     int index = 0;
     
     JMenu copyFromMenu;
-    JMenu[] copyFromMenuSubMenus;
     final ActionListener listener;
     
     ThumbnailPopupMenu()

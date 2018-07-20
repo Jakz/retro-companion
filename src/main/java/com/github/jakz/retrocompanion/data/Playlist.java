@@ -4,6 +4,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -31,7 +32,7 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
   
   public String toString()
   {
-    return String.format("%s (%d) (%s)", nameWithExtension(), entries.size(), StringUtils.humanReadableByteCount(sizeInBytes(null), true, true));   
+    return String.format("%s (%d) (%s)", nameWithExtension(), entries.size(), StringUtils.humanReadableByteCount(sizeInBytes(), true, true));   
   }
   
   public void markDirty() 
@@ -44,21 +45,16 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     sizeInBytes = -1;
   }
   
-  public void cacheSize(Mediator mediator)
+  public void cacheSize()
   {
-    sizeInBytes = entries.stream().mapToLong(e -> e.sizeInBytes(mediator)).sum();
+    sizeInBytes = entries.stream().mapToLong(e -> e.sizeInBytes()).sum();
   }
   
-  public long sizeInBytes(Mediator mediator)
+  public long sizeInBytes()
   {
     if (sizeInBytes == -1)
-    {
-      if (mediator != null)
-        cacheSize(mediator);
-      else
-        sizeInBytes = 0;
-    }
-    
+      cacheSize();
+
     return sizeInBytes;
   }
   
@@ -72,6 +68,11 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     return path;
   }
   
+  public void rename(String newName)
+  {
+    this.path = path.getParent().resolve(newName + ".lpl");
+  }
+  
   public String name()
   {
     return FileUtils.fileNameWithoutExtension(path);
@@ -82,12 +83,14 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     return path.getFileName().toString(); 
   }
   
-  public void save(Path path) throws IOException
+  public void save(Mediator mediator, Path path) throws IOException
   {
+    final Path basePath = mediator.options().relativizePathsWhenPossible ? mediator.options().retroarchPath : Paths.get(".");
+    
     try (BufferedWriter wrt = Files.newBufferedWriter(path))
     {
       for (Entry entry : entries)
-        wrt.write(entry.toPlaylistFormat());
+        wrt.write(entry.toPlaylistFormat(mediator.options().retroarchPath));
     }
   }
   

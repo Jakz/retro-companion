@@ -34,7 +34,7 @@ public class Options
   public boolean overwriteThumbnailWithoutConfirmation;
   public boolean thumbnailMoveInsteadThanCopy;
   public boolean showConfirmationDialogForUndoableOperations;
-  public boolean autoRelativizePathsWhenImporting;
+  public boolean relativizePathsWhenPossible;
   public boolean skipImportingDuplicates;
   public boolean ignoreUnknownCores;
   public boolean calculateSizes;
@@ -53,7 +53,7 @@ public class Options
     overwriteThumbnailWithoutConfirmation = true;
     thumbnailMoveInsteadThanCopy = false;
     showConfirmationDialogForUndoableOperations = true;
-    autoRelativizePathsWhenImporting = true;
+    relativizePathsWhenPossible = true;
     skipImportingDuplicates = true;
     ignoreUnknownCores = true;
     calculateSizes = false;

@@ -67,7 +67,7 @@ public interface PlaylistTask
   {
     try
     {
-      playlist.save(playlist.path());
+      playlist.save(mediator, playlist.path());
       return true;
     }
     catch (IOException e)
@@ -100,11 +100,43 @@ public interface PlaylistTask
   {
     return (mediator, playlist) ->
     {
-      if (playlist.name().equals(name))
+      String normalizedName = name.replaceAll("[\\&\\*\\/\\:\\`\\<\\>\\?\\|]", "_");
+      
+      /* no name change: do nothing */
+      if (playlist.name().equals(normalizedName))
         return false;
       else
       {
-        //TODO: finish
+        /* name already used: do nothing */
+        boolean invalidName = mediator.playlists().stream().anyMatch(p -> p.name().equals(normalizedName));
+        
+        if (invalidName)
+          throw new TaskException("Another playlist with the same name already exists");
+        
+        boolean confirmed = Tasks.askForConfirmation(mediator, "Renaming the playlist can't be undone, are you sure you want to proceed?" +
+                                                               " This will update the playlist content to disk too."); 
+        try
+        {
+          if (confirmed)
+          {
+            final String oldName = playlist.name();
+            final Path oldPath = playlist.path();
+            
+            playlist.rename(normalizedName);
+            playlist.save(mediator, playlist.path());
+
+            Files.delete(oldPath);
+            
+            //TODO: move single files, not whole folder to allow merge
+            Path thumbnailFolder = mediator.options().thumbnailsPath.resolve(oldName);
+            Files.move(thumbnailFolder, mediator.options().thumbnailsPath.resolve(normalizedName));
+          }
+        }
+        catch (IOException e)
+        {
+          throw new TaskException("Exception while saving playlist after rename", e);
+        }
+        
       }
       
       return true;

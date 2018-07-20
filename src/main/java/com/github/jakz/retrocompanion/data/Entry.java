@@ -39,28 +39,19 @@ public class Entry
   
   public void setPath(Path path) { this.path = path; }
   public Path path() { return path; }
-  public Path absolutePath(Mediator mediator)
-  { 
-    if (path.isAbsolute())
-      return path;
-    else //TOOD: always safe?
-      return mediator.options().retroarchPath.resolve(path).normalize().toAbsolutePath();
-  }
-  
+
   public void markSizeDirty()
   { 
     sizeInBytes = -1; 
     playlist.markSizeDirty();
   }
   
-  public long sizeInBytes(Mediator mediator)
+  public long sizeInBytes()
   {
     if (sizeInBytes == -1)
     {
       try 
-      {
-        Path path = absolutePath(mediator);
-        
+      {        
         if (FileUtils.pathExtension(path).equals("scummvm"))
           sizeInBytes += FileUtils.folderSize(path.getParent(), true, false);
         else if (FileUtils.pathExtension(path).equals("m3u"))
@@ -148,12 +139,23 @@ public class Entry
     return true;
   }
   
-  public String toPlaylistFormat()
+  public String toPlaylistFormat(Path base)
   {
     StringBuilder sb = new StringBuilder();
     String nl = System.lineSeparator();
     
-    sb.append(path.toString()).append(nl)
+    Path finalPath = path;
+    
+    try
+    {
+      finalPath = base.relativize(path).normalize();
+    }
+    catch (IllegalArgumentException e)
+    {
+      /* silently ignore, keep finalPath */
+    }
+    
+    sb.append(finalPath.toString()).append(nl)
       
       .append(name).append(nl)
       

@@ -105,7 +105,7 @@ public class Main
       {
         List<Playlist> playlists = Tasks.Standalone.loadPlaylistsFromFolder(options().playlistsPath, options);
         playlists.sort((p1, p2) -> p1.path().compareTo(p2.path()));
-        playlists.forEach(p -> p.cacheSize(this));
+        playlists.forEach(p -> p.cacheSize());
         
         Main.playlists.clear();
         Main.playlists.addAll(playlists);
@@ -119,7 +119,7 @@ public class Main
     @Override
     public void refreshPlaylistMetadata()
     {
-      playlist().cacheSize(this);
+      playlist().cacheSize();
       playlistInfoPanel.refresh();
       mainPanel.playlistChooser.repaint();
       mainPanel.toolbar.updateSummaryLabel(this);

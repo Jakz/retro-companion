@@ -155,7 +155,7 @@ public class PlaylistTablePanel extends JPanel
       formatColumn.setWidth(60);
       model.addColumn(formatColumn);
       
-      ColumnSpec<Entry, String> sizeColumn = new ColumnSpec<>("S", String.class, e -> StringUtils.humanReadableByteCount(e.sizeInBytes(mediator)));
+      ColumnSpec<Entry, String> sizeColumn = new ColumnSpec<>("S", String.class, e -> StringUtils.humanReadableByteCount(e.sizeInBytes()));
       sizeColumn.setWidth(80);
       model.addColumn(sizeColumn);
       
@@ -253,7 +253,7 @@ public class PlaylistTablePanel extends JPanel
       else
         component.setForeground(Color.BLACK);
       
-      if (!Files.exists(entry.absolutePath(mediator)))
+      if (!Files.exists(entry.path()))
         component.setForeground(Color.RED);
       
       /*

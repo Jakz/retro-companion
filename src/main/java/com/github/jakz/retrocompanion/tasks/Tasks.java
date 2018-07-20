@@ -238,15 +238,16 @@ public class Tasks
     }
   }
   
-  public static void executeTaskUI(Mediator mediator, PlaylistTask task)
+  public static boolean executeTaskUI(Mediator mediator, PlaylistTask task)
   {
     try
     {
-      Tasks.executePlaylistTask(mediator, task, mediator.playlist());
+      return Tasks.executePlaylistTask(mediator, task, mediator.playlist());
     }
     catch (TaskException e)
     {
       mediator.handleException(e);
+      return false;
     }
   }
   

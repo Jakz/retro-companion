@@ -54,11 +54,14 @@ public class ExceptionPanel extends JPanel
     
     throwable = throwable.getCause();
     if (throwable != null)
+    {
       text.append("Caused by ").append(throwable.toString()).append("\n");
-    
-    StackTraceElement[] stack = throwable.getStackTrace();
-    for (StackTraceElement element : stack)
-      text.append("  ").append(element.toString()).append("\n");
+      
+      StackTraceElement[] stack = throwable.getStackTrace();
+      for (StackTraceElement element : stack)
+        text.append("  ").append(element.toString()).append("\n");
+    }
+
     
     area.setText(text.toString());
     area.setCaretPosition(0);

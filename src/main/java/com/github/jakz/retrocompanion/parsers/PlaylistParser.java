@@ -18,7 +18,16 @@ import com.pixbits.lib.functional.StreamUtil;
 
 public class PlaylistParser
 {
-  public static PendingEntry parseEntry(List<String> lines)
+
+  
+  private final Options options;
+  
+  public PlaylistParser(Options options)
+  {
+    this.options = options;
+  }
+  
+  private static PendingEntry parseEntry(List<String> lines)
   {
     if (lines.size() != 6)
       throw new ParseException("an entry requires 6 lines to be parsed correctly");
@@ -44,13 +53,6 @@ public class PlaylistParser
     return entry;
   }
   
-  private final Options options;
-  
-  public PlaylistParser(Options options)
-  {
-    this.options = options;
-  }
-  
   public Entry resolve(Playlist playlist, PendingEntry entry)
   {
     CoreSet cores = options.cores;
@@ -69,15 +71,15 @@ public class PlaylistParser
       
       return new Core.Ref(core, entry.coreName);
     }));
-    
 
-    
     /* parse database reference */
     
     if (!options.autoFixPlaylistNamesInEntries && !entry.playlistName.toString().equals(playlist.nameWithExtension()))
       throw new ParseException("Name of playlist in entry doesn't match name of playlist itself ('%s' != '%s')", entry.playlistName.toString(), playlist.nameWithExtension());
 
-    return new Entry(playlist, entry.path, entry.name, coreRef, entry.dbref);
+    Path path = options.retroarchPath.resolve(entry.path).normalize().toAbsolutePath();
+    
+    return new Entry(playlist, path, entry.name, coreRef, entry.dbref);
   }
   
   public Playlist parse(Path filepath)

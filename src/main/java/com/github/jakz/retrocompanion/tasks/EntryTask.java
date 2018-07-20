@@ -69,20 +69,20 @@ public interface EntryTask
         if (!format.canWrite)
           throw new TaskException("Format %s can't be compressed", format.extension());
         
-        if (!Files.exists(entry.absolutePath(mediator)))
+        if (!Files.exists(entry.path()))
           throw new TaskException("Entry file doesn't exist");
 
         boolean isAlreadyArchive = ArchiveFormat.guessFormat(entry.path()) != null; 
         
         if (!isAlreadyArchive)
         {
-          Path destPath = entry.absolutePath(mediator).getParent().resolve(FileUtils.fileNameWithoutExtension(entry.path()) + format.dottedExtension());
+          Path destPath = entry.path().getParent().resolve(FileUtils.fileNameWithoutExtension(entry.path()) + format.dottedExtension());
           
           Compressor<Compressible> compressor = new Compressor<>(new CompressorOptions(format, false, 9));
-          compressor.createArchive(destPath, Collections.singletonList(Compressible.ofPath(entry.absolutePath(mediator))));
+          compressor.createArchive(destPath, Collections.singletonList(Compressible.ofPath(entry.path())));
           
           //Files.delete(entry.absolutePath(mediator));
-          entry.setPath(entry.path().getParent().resolve(destPath.getFileName()));       
+          entry.setPath(destPath);       
           entry.markSizeDirty();
         }
         
@@ -98,18 +98,18 @@ public interface EntryTask
   public static final EntryTask UncompressEntry = (mediator, entry) -> {
     try
     {      
-      Archive archive = new Archive(entry.absolutePath(mediator), true);
+      Archive archive = new Archive(entry.path(), true);
       //TODO: archive has more than 1 file, this probably shouldn't be extracted?
       if (archive.size() > 1)
         throw new TaskException("Error while extracting archive for"+entry.name()+": entry has more than one file in the archive");
       
       Item item = archive.itemAt(0);
-      Path destPath = entry.absolutePath(mediator).getParent().resolve(item.path);     
+      Path destPath = entry.path().getParent().resolve(item.path);     
       
       archive.extract(item, destPath);
       
       //Files.delete(entry.absolutePath(mediator));
-      entry.setPath(entry.path().getParent().resolve(item.path));
+      entry.setPath(destPath);
       entry.markSizeDirty();
       
       archive.close();

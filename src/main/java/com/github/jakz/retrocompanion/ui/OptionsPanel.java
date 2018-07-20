@@ -43,7 +43,7 @@ public class OptionsPanel extends JPanel
     optionFields = new Option<?>[] {
       new Option<Boolean>("Auto-Fix playlist names in file", "autoFixPlaylistNamesInEntries", mediator.options()),
       new Option<Boolean>("Show confirmation dialogs for undoable operations", "showConfirmationDialogForUndoableOperations", mediator.options()),
-      new Option<Boolean>("Relativize paths to Retroarch when importing", "autoRelativizePathsWhenImporting", mediator.options()),
+      new Option<Boolean>("Keep paths relative to RetroArch when possible", "relativizePathsWhenPossible", mediator.options()),
       new Option<Boolean>("Skipping importing already present files", "skipImportingDuplicates", mediator.options()),
       new Option<Boolean>("Overwrite thumbnails without confirmation", "overwriteThumbnailWithoutConfirmation", mediator.options()),
       new Option<Boolean>("Move thumbnails instead that copying them", "thumbnailMoveInsteadThanCopy", mediator.options()),

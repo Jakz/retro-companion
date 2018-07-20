@@ -172,7 +172,7 @@ public class PlaylistTableTransferHandler extends TransferHandler
     FolderScanner scanner = new FolderScanner(FolderScanner.FolderMode.ADD_TO_RESULT);
     
     Set<Path> used = mediator.options().skipImportingDuplicates ?
-      mediator.playlist().stream().map(e -> e.absolutePath(mediator)).collect(Collectors.toSet()) :
+      mediator.playlist().stream().map(Entry::path).collect(Collectors.toSet()) :
       Collections.emptySet();
     
     int count = 0;
@@ -211,10 +211,6 @@ public class PlaylistTableTransferHandler extends TransferHandler
   public void addEntry(int index, Path path)
   {
     Entry entry = new Entry(mediator.playlist(), path, FileUtils.fileNameWithoutExtension(path), Optional.empty(), Optional.empty());
-    
-    if (mediator.options().autoRelativizePathsWhenImporting)
-      entry.relativizePath(mediator.options().retroarchPath);
-    
     mediator.playlist().add(index, entry);
   }
 }
