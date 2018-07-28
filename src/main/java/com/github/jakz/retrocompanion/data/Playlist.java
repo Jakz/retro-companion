@@ -90,7 +90,7 @@ public class Playlist implements Iterable<Entry>, ModifiableDataSource<Entry>
     try (BufferedWriter wrt = Files.newBufferedWriter(path))
     {
       for (Entry entry : entries)
-        wrt.write(entry.toPlaylistFormat(mediator.options().retroarchPath));
+        wrt.write(entry.toPlaylistFormat(basePath));
     }
   }
   

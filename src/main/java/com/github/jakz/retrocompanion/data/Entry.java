@@ -12,6 +12,8 @@ import com.github.jakz.romlib.formats.PlaylistM3U;
 import com.pixbits.lib.functional.StreamException;
 import com.pixbits.lib.io.FileUtils;
 import com.pixbits.lib.io.archive.ArchiveFormat;
+import com.pixbits.lib.ui.UIUtils;
+import com.pixbits.lib.ui.UIUtils.OperatingSystem;
 
 public class Entry
 {
@@ -105,7 +107,9 @@ public class Entry
       for (ThumbnailType tt : ThumbnailType.values())
       {
         Path oldPath = options.pathForThumbnail(playlist, tt, this);
-        Path newPath = options.pathForThumbnail(playlist, tt, name());
+        Path newPath = options.pathForThumbnail(playlist, tt, name);
+        
+        System.out.printf("Trying to rename %s to %s\n", oldPath.toString(), newPath.toString());
         
         if (Files.exists(oldPath))
           Files.move(oldPath, newPath);
@@ -155,7 +159,12 @@ public class Entry
       /* silently ignore, keep finalPath */
     }
     
-    sb.append(finalPath.toString()).append(nl)
+    String pathString = finalPath.toString();
+    
+    if (UIUtils.getOperatingSystem().isWindows())
+      pathString = pathString.replace('\\', '/');
+    
+    sb.append(pathString).append(nl)
       
       .append(name).append(nl)
       
